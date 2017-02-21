@@ -15,6 +15,22 @@ class ReportGenerator:
 
         # TODO: what should we put for the title?
         self.headerStr += "\t\t\tCMS-2 Source Analyzer/SAN (VAX) Version 12.01\n"
+
+        # TODO: figure out how to number pages
+        self.headerStr += "Page 1\n\n\n\t\t\t\tSource Analysis Summary\n"
+
+        self.headerStr += "0\t\t\n"
+
+        # may need separate string to fill in number of tabs and key in between
+        self.headerStr += "\tComponent\t"
+
+        # Don't use key for now
+        for key, val in self.components.items():
+            for itemHeader in val:
+                self.headerStr += itemHeader + "\t" + itemHeader + "\t"
+        self.headerStr += "\nMX Delimt\n"
+        self.headerStr += "\tName\tType"
+
         return self.headerStr
 
     # return a string representation of this Report, a la java toString
@@ -29,7 +45,8 @@ class ReportGenerator:
         result += self.reportStr
         return result
 
-    def __init__(self):
+    def __init__(self, components):
+        self.components = components
         self.headerStr = ""
         self.reportStr = self.getHeaderStr()
 
@@ -38,7 +55,10 @@ class ReportGenerator:
             f.write(self.reportStr)
 
 def main():
-    gen = ReportGenerator()
+    # TODO: what is the best way to structure this?
+    # Currently will print "Stmts" and "Lines" for each type, but that's not the case in the sample report
+    components = {"High Level CMS-2" : ["Exec", "Data", "Comment", "NonCmt", "Other"], "CMS-2 DIRECT" : ["Exec", "Data", "Comment"]}
+    gen = ReportGenerator(components)
     print(str(gen))
 
 if __name__ == "__main__":
