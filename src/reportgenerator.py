@@ -6,6 +6,20 @@ from collections import OrderedDict
 class ReportGenerator:
     """Class used to compare new and old versions of source files in the specified language"""
 
+    # TODO: this is currently broken!!!
+    def getSectionString(self, categoriesStr, sectionName):
+        # a section string is divided the following way:
+        # start and end are denoted by '+'s
+        # the +'s are followed/preceded by an equal number of '-'s
+        # the -'s are followed/preceded by a space with the name of the section in between
+        totalLen = len(categoriesStr)
+        nameLen = len(sectionName)
+        result = "+"
+        numDashes = int(totalLen / 2) - int(nameLen / 2 + 1)
+        dashes = "-" * numDashes
+        result += dashes +  " " + sectionName + " " + dashes + "+"
+        return result
+
     def getHeaderStr(self):
         # strings to be written to text files are to be line separated by '\n'
         # on all platforms, see linesep documentation at https://docs.python.org/3/library/os.html
@@ -24,17 +38,22 @@ class ReportGenerator:
         version = "0\t\t"
 
         # may need separate string to fill in number of tabs and key in between
-        categories = "\tComponent\t"
+        categoriesHeader = "\tComponent\t"
         fields = "\t"
 
-        # Don't use key for now
+        categories = ""
+        categoriesStart = 0
+        sectionStr = ""
         for key, val in self.components.items():
             for itemKey, itemVal in val.items():
                 for field in itemVal:
                     categories += itemKey + "\t"
                     fields += field + "\t"
+            categoriesLen = len(categories)
+            sectionStr += self.getSectionString(categories[categoriesStart:categoriesLen], key) + "\t"
+            categoriesStart = categoriesLen
         
-        self.headerStr = dateTitle + version + "\n" + categories
+        self.headerStr = dateTitle + version + "\t" + sectionStr + "\n" + categoriesHeader +  categories
         self.headerStr += "\nMX Delimt\n"
         self.headerStr += "\tName\tType" + fields
 
