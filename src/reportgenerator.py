@@ -6,14 +6,25 @@ from collections import OrderedDict
 class ReportGenerator:
     """Class used to compare new and old versions of source files in the specified language"""
 
-    # TODO: this is currently broken!!!
     def getSectionString(self, categoriesStr, sectionName):
         # a section string is divided the following way:
         # start and end are denoted by '+'s
         # the +'s are followed/preceded by an equal number of '-'s
         # the -'s are followed/preceded by a space with the name of the section in between
-        totalLen = len(categoriesStr)
+
+        # This doesn't give the true length of the string since \t would be considered one character
+        #totalLen = len(categoriesStr)
+
+        totalLen = 0
+        tabLength = 4
+        for index in range(len(categoriesStr)):
+            if categoriesStr[index] == '\t':
+                totalLen += tabLength - (index % tabLength)
+            else:
+                totalLen += 1
+        # TODO: note this breaks if the sectionName contains a '\t' character
         nameLen = len(sectionName)
+
         result = "+"
         numDashes = int(totalLen / 2) - int(nameLen / 2 + 1)
         dashes = "-" * numDashes
