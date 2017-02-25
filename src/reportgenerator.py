@@ -1,6 +1,7 @@
 # Author: Johan Burke
 
 from datetime import datetime
+from collections import OrderedDict
 
 class ReportGenerator:
     """Class used to compare new and old versions of source files in the specified language"""
@@ -11,25 +12,31 @@ class ReportGenerator:
         self.headerStr += "\n"
         now = datetime.now()
 
-        self.headerStr += now.strftime("%d-%b-%Y %H:%M:%S")
+        dateTitle = now.strftime("%d-%b-%Y %H:%M:%S")
 
         # TODO: what should we put for the title?
-        self.headerStr += "\t\t\tCMS-2 Source Analyzer/SAN (VAX) Version 12.01\n"
+        dateTitle += "\t\t\tCMS-2 Source Analyzer/SAN (VAX) Version 12.01\n"
 
         # TODO: figure out how to number pages
-        self.headerStr += "Page 1\n\n\n\t\t\t\tSource Analysis Summary\n"
+        dateTitle += "Page 1\n\n\n\t\t\t\tSource Analysis Summary\n"
 
-        self.headerStr += "0\t\t\n"
+        # denotes High Level CMS-2, CMS-2 DIRECT, or something else
+        version = "0\t\t"
 
         # may need separate string to fill in number of tabs and key in between
-        self.headerStr += "\tComponent\t"
+        categories = "\tComponent\t"
+        fields = "\t"
 
         # Don't use key for now
         for key, val in self.components.items():
-            for itemHeader in val:
-                self.headerStr += itemHeader + "\t" + itemHeader + "\t"
+            for itemKey, itemVal in val.items():
+                for field in itemVal:
+                    categories += itemKey + "\t"
+                    fields += field + "\t"
+        
+        self.headerStr = dateTitle + version + "\n" + categories
         self.headerStr += "\nMX Delimt\n"
-        self.headerStr += "\tName\tType"
+        self.headerStr += "\tName\tType" + fields
 
         return self.headerStr
 
@@ -57,7 +64,19 @@ class ReportGenerator:
 def main():
     # TODO: what is the best way to structure this?
     # Currently will print "Stmts" and "Lines" for each type, but that's not the case in the sample report
-    components = {"High Level CMS-2" : ["Exec", "Data", "Comment", "NonCmt", "Other"], "CMS-2 DIRECT" : ["Exec", "Data", "Comment"]}
+    components = OrderedDict()
+    components["High Level CMS-2"] = OrderedDict()
+    components["High Level CMS-2"]["Exec"] = ["Stmts", "Lines"]
+    components["High Level CMS-2"]["Data"] = ["Stmts", "Lines"]
+    components["High Level CMS-2"]["Comment"] = ["Stmts", "Lines"]
+    components["High Level CMS-2"]["NonCmt"] = ["Lines"]
+    components["High Level CMS-2"]["Other"] = ["Stmts"]
+
+    components["CMS-2 DIRECT"] = OrderedDict()
+    components["CMS-2 DIRECT"]["Exec"] = ["Stmts"]
+    components["CMS-2 DIRECT"]["Data"] = ["Stmts"]
+    components["CMS-2 DIRECT"]["Comment"] = ["Lines"]
+
     gen = ReportGenerator(components)
     print(str(gen))
 
