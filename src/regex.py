@@ -37,6 +37,9 @@ def analyze(lines, name):
     block_comment_line_counter = 0
     block_comment_dictionary = {}
 
+    note_counter = 0
+    note_dictionary = {}
+
     # Accepts 'X' followed by any number of digits or 'A/' followed by any number of digits.
     exec_pattern = '(X[0-9]+|A/[0-9]+)'
 
@@ -46,6 +49,9 @@ def analyze(lines, name):
     # Accepts any digits followed by any number of white spaces, followed by 'COMMENT', followed by any characters.
     block_comment_pattern = '([0-9]*\sCOMMENT.*)'
 
+    # Accepts two single apostrophes (''), followed by any characters/digits, followed by two single apostrophes.
+    note_pattern = '(''[\w|\s]*'')'      #'([\w|\s]* '' [\w|\s]* '')|(''[\w|\s]*'')'
+
     for i in range(len(lines)):
         current_line = ""
         comment_text = ""
@@ -54,6 +60,13 @@ def analyze(lines, name):
         if re.match(exec_pattern, lines[i]):
             executable_counter += 1
             current_line = re.match(exec_pattern, lines[i]).group(1)
+
+        # Checks to see if the current line contains a programmer's note.
+        if re.search(note_pattern, lines[i]):
+            note_counter += 1
+            # Adds note to note_dictionary.
+            comment_text = re.search(note_pattern, lines[i]).group(1)
+            note_dictionary[current_line] = comment_text
 
         # Checks first to see if a block comment is present. If not, checks for single line comments.r
         if re.search(block_comment_pattern, lines[i]):
@@ -67,6 +80,7 @@ def analyze(lines, name):
                 if "$" in lines[j]:
                     break
             block_comment_dictionary[i] = comment_text
+
         # Checks to see if the current line contains an in-line comment.
         elif re.search(single_comment_pattern, lines[i]):
             single_comments_counter += 1
@@ -81,6 +95,8 @@ def analyze(lines, name):
             print("GOTO detected on line " + str(current_line))
 
     print()
+    print("Notes: " + str(note_counter))
+    print()
     print("Single line comments: " + str(single_comments_counter))
     print()
     print("Block comments: " + str(block_comment_counter))
@@ -89,6 +105,11 @@ def analyze(lines, name):
     print("Total lines: " + str(len(lines)))
     print()
     print()
+
+    # Prints all notes.
+    for key, value in note_dictionary.items():
+        print("Line " + key + " contains the note: " + value)
+
     # Prints all single line comments.
     for key, value in single_comment_dictionary.items():
         print("Line " + key + " contains the single line comment: " + value)
