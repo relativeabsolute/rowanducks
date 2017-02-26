@@ -50,7 +50,7 @@ def analyze(lines, name):
     block_comment_pattern = '([0-9]*\sCOMMENT.*)'
 
     # Accepts two single apostrophes (''), followed by any characters/digits, followed by two single apostrophes.
-    note_pattern = '(''[\w|\s]*'')'      #'([\w|\s]* '' [\w|\s]* '')|(''[\w|\s]*'')'
+    note_pattern = '(\'\'[\w|\s|-]*\'\')'
 
     for i in range(len(lines)):
         current_line = ""
