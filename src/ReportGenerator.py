@@ -21,14 +21,15 @@ class ReportGenerator:
         tab_length = 4
         for index in range(len(categories_string)):
             if categories_string[index] == '\t':
-                total_length += tab_length - (index % tab_length)
+                to_add = tab_length - (index % tab_length)
+                total_length += to_add
             else:
                 total_length += 1
         # TODO: note this breaks if the sectionName contains a '\t' character
         name_length = len(section_name)
 
         result = "+"
-        num_dashes = int(total_length / 2) - int(name_length / 2 + 1)
+        num_dashes = int(total_length / 2) - int(name_length / 2 + 1) 
         dashes = "-" * num_dashes
         result += dashes + " " + section_name + " " + dashes + "+"
         return result
@@ -62,9 +63,12 @@ class ReportGenerator:
                 for field in itemVal:
                     categories += itemKey + "\t"
                     fields += field + "\t"
-            categories_length = len(categories)
-            section_string += self.get_section_string(categories[categories_start:categories_length], key) + "\t"
-            categories_start = categories_length
+            if key != "":
+                categories += "\t"
+                fields += "\t"
+                categories_length = len(categories)
+                section_string += self.get_section_string(categories[categories_start:categories_length], key) + "\t"
+                categories_start = categories_length
 
         self.header_string = date_title + version + "\t" + section_string + "\n" + categories_header + categories
         self.header_string += "\nMX Delimt\n"
@@ -109,6 +113,13 @@ def main():
     components["CMS-2 DIRECT"]["Exec"] = ["Stmts"]
     components["CMS-2 DIRECT"]["Data"] = ["Stmts"]
     components["CMS-2 DIRECT"]["Comment"] = ["Lines"]
+
+    components["Total"] = OrderedDict()
+    components["Total"]["Exec"] = ["Stmts"]
+    components["Total"]["Source"] = ["Lines"]
+
+    components[""] = OrderedDict()
+    components[""]["CSWTC"] = ["Stmts"]
 
     gen = ReportGenerator(components)
     print(str(gen))
