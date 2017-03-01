@@ -53,6 +53,14 @@ def analyze(lines, name):
         current_line = ""
         comment_text = ""
 
+        # Detects Direct CMS-2 code blocks and sends the entire block to be analyzed.
+        if re.search('(DIRECT\s*\$)', lines[i]):
+            for j in range(i, len(lines)):
+                print(lines[j])
+                if re.search("(CMS-2\s*\$)", lines[j]):
+                    analyze_direct(lines[i:j+1])
+                    break
+
         # Checks to see if the current line is executable code.
         if re.match(exec_pattern, lines[i]):
             executable_counter += 1
@@ -68,7 +76,6 @@ def analyze(lines, name):
         # Checks first to see if a block comment is present. If not, checks for single line comments.r
         if re.search(block_comment_pattern, lines[i]):
             block_comment_counter += 1
-            # j = 0 (PyCharm says this is never used. I commented it out just in case.)
             # It loops through next lines until '$' is found (end of the comment).
             # Then it appends the message each iteration.
             for j in range(i, len(lines)):
@@ -120,9 +127,9 @@ def analyze_direct(lines):
     single_comments_counter = 0
     single_comment_dictionary = {}
 
-    current_line = re.match(exec_pattern, lines[i]).group(1)
-
     for i in range(len(lines)):
+        current_line = re.match(exec_pattern, lines[i]).group(1)
+
         if re.search(single_comment_pattern, lines[i]):
             single_comments_counter += 1
 
