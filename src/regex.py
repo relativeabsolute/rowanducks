@@ -129,7 +129,7 @@ def check_file_extension(filename):
         valid_name = True
     else:
         valid_name = False
-        print("Expected file extension .cts or .cs2, found " + extension)
+        print("Expected file extension .cts or .cs2, found " + extension + " in " + filename)
 
 
 # TODO everything
