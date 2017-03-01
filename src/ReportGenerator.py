@@ -120,6 +120,8 @@ def main():
 
     components[""] = OrderedDict()
     components[""]["CSWTC"] = ["Stmts"]
+    components[""]["MX"] = ["LV"]
+    components[""]["Delimt"] = ["Stmts"]
 
     gen = ReportGenerator(components)
     print(str(gen))
