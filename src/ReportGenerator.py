@@ -1,5 +1,6 @@
 # Author: Johan Burke
 
+import time
 from datetime import datetime
 from collections import OrderedDict
 
@@ -123,8 +124,15 @@ def main():
     components[""]["MX"] = ["LV"]
     components[""]["Delimt"] = ["Stmts"]
 
+    beforeTime = time.time()
     gen = ReportGenerator(components)
+    afterTime = time.time()
     print(str(gen))
+    # TODO: convert to human readable time format
+    print("Before time = " + str(time.ctime(beforeTime)))
+    print("After time = " + str(time.ctime(afterTime)))
+    print("Time spent generating report = " + str(afterTime - beforeTime))
+
 
 
 if __name__ == "__main__":
