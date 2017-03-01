@@ -6,6 +6,18 @@ import os
 sample_file = "CMS2YSample.txt"
 valid_name = False
 
+# Accepts 'X' followed by any number of digits or 'A/' followed by any number of digits.
+exec_pattern = '(X[0-9]+|A/[0-9]+)'
+
+# Accepts a '.' followed by any number of any characters until line ends to extract in-line comment.
+single_comment_pattern = '(\. .*)'
+
+# Accepts any digits followed by any number of white spaces, followed by 'COMMENT', followed by any characters.
+block_comment_pattern = '([0-9]*\sCOMMENT.*)'
+
+# Accepts two single apostrophes (''), followed by any characters/digits, followed by two single apostrophes.
+note_pattern = '(\'\'[\w|\s|-]*\'\')'
+
 
 def main():
     split_file(sample_file)
@@ -27,9 +39,6 @@ def analyze(lines, name):
     # Before all else, check to see if valid file extension
     check_file_extension(name)
 
-    single_comments_counter = 0
-    single_comment_dictionary = {}
-
     executable_counter = 0
     goto_counter = 0
 
@@ -39,18 +48,6 @@ def analyze(lines, name):
 
     note_counter = 0
     note_dictionary = {}
-
-    # Accepts 'X' followed by any number of digits or 'A/' followed by any number of digits.
-    exec_pattern = '(X[0-9]+|A/[0-9]+)'
-
-    # Accepts a '.' followed by any number of any characters until line ends to extract in-line comment.
-    single_comment_pattern = '(\. .*)'
-
-    # Accepts any digits followed by any number of white spaces, followed by 'COMMENT', followed by any characters.
-    block_comment_pattern = '([0-9]*\sCOMMENT.*)'
-
-    # Accepts two single apostrophes (''), followed by any characters/digits, followed by two single apostrophes.
-    note_pattern = '(\'\'[\w|\s|-]*\'\')'
 
     for i in range(len(lines)):
         current_line = ""
@@ -84,13 +81,6 @@ def analyze(lines, name):
 
         # Checks to see if the current line contains an in-line comment.
 
-        elif re.search(single_comment_pattern, lines[i]):
-            single_comments_counter += 1
-
-            # Adds comment to single_comment_dictionary
-            comment_text = re.search(single_comment_pattern, lines[i]).group(1)
-            single_comment_dictionary[current_line] = comment_text
-
         if 'GOTO' in lines[i]:
             # I'm not sure how to handle this yet, but the sample output keeps track of them.
             goto_counter += 1
@@ -98,8 +88,6 @@ def analyze(lines, name):
 
     print()
     print("Notes: " + str(note_counter))
-    print()
-    print("Single line comments: " + str(single_comments_counter))
     print()
     print("Block comments: " + str(block_comment_counter))
     print("Block comment lines: " + str(block_comment_line_counter))
@@ -111,10 +99,6 @@ def analyze(lines, name):
     # Prints all notes.
     for key, value in note_dictionary.items():
         print("Line " + key + " contains the note: " + value)
-
-    # Prints all single line comments.
-    for key, value in single_comment_dictionary.items():
-        print("Line " + key + " contains the single line comment: " + value)
 
     # Prints all block comments
     print()
@@ -130,6 +114,27 @@ def check_file_extension(filename):
     else:
         valid_name = False
         print("Expected file extension .cts or .cs2, found " + extension + " in " + filename)
+
+
+def analyze_direct(lines):
+    single_comments_counter = 0
+    single_comment_dictionary = {}
+
+    current_line = re.match(exec_pattern, lines[i]).group(1)
+
+    for i in range(len(lines)):
+        if re.search(single_comment_pattern, lines[i]):
+            single_comments_counter += 1
+
+            # Adds comment to single_comment_dictionary
+            comment_text = re.search(single_comment_pattern, lines[i]).group(1)
+            single_comment_dictionary[current_line] = comment_text
+
+    print("Single line comments: " + str(single_comments_counter))
+
+    # Prints all single line comments.
+    for key, value in single_comment_dictionary.items():
+        print("Line " + key + " contains the single line comment: " + value)
 
 
 # TODO everything
