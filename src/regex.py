@@ -13,8 +13,8 @@ def main():
 
 # The method splits a CMS-2Y file by newline characters and prints out each line.
 # This is just for testing and getting reacquainted with Python.
-def split_file(file_):
-    f = open(file_).read().splitlines()
+def split_file(file):
+    f = open(file).read().splitlines()
     # for line in f:
     # print(line)
     analyze(f, sample_file)
@@ -31,20 +31,26 @@ def analyze(lines, name):
     single_comment_dictionary = {}
 
     executable_counter = 0
-    go_to_counter = 0
+    goto_counter = 0
 
     block_comment_counter = 0
     block_comment_line_counter = 0
     block_comment_dictionary = {}
 
-    # It accepts 'X' followed by any number of digits or 'A/' followed by any number of digits.
+    note_counter = 0
+    note_dictionary = {}
+
+    # Accepts 'X' followed by any number of digits or 'A/' followed by any number of digits.
     exec_pattern = '(X[0-9]+|A/[0-9]+)'
 
-    # It accepts a '.' followed by any number of any characters until line ends to extract in-line comment.
+    # Accepts a '.' followed by any number of any characters until line ends to extract in-line comment.
     single_comment_pattern = '(\. .*)'
 
-    # It accepts any digits followed by any number of white spaces, followed by 'COMMENT', followed by any characters.
+    # Accepts any digits followed by any number of white spaces, followed by 'COMMENT', followed by any characters.
     block_comment_pattern = '([0-9]*\sCOMMENT.*)'
+
+    # Accepts two single apostrophes (''), followed by any characters/digits, followed by two single apostrophes.
+    note_pattern = '(\'\'[\w|\s|-]*\'\')'
 
     for i in range(len(lines)):
         current_line = ""
@@ -54,6 +60,13 @@ def analyze(lines, name):
         if re.match(exec_pattern, lines[i]):
             executable_counter += 1
             current_line = re.match(exec_pattern, lines[i]).group(1)
+
+        # Checks to see if the current line contains a programmer's note.
+        if re.search(note_pattern, lines[i]):
+            note_counter += 1
+            # Adds note to note_dictionary.
+            comment_text = re.search(note_pattern, lines[i]).group(1)
+            note_dictionary[current_line] = comment_text
 
         # Checks first to see if a block comment is present. If not, checks for single line comments.r
         if re.search(block_comment_pattern, lines[i]):
@@ -68,7 +81,9 @@ def analyze(lines, name):
                 if "$" in lines[j]:
                     break
             block_comment_dictionary[i] = comment_text
-        # The elif checks to see if the current line contains an in-line comment.
+
+        # Checks to see if the current line contains an in-line comment.
+
         elif re.search(single_comment_pattern, lines[i]):
             single_comments_counter += 1
 
@@ -78,9 +93,11 @@ def analyze(lines, name):
 
         if 'GOTO' in lines[i]:
             # I'm not sure how to handle this yet, but the sample output keeps track of them.
-            go_to_counter += 1
+            goto_counter += 1
             print("GOTO detected on line " + str(current_line))
 
+    print()
+    print("Notes: " + str(note_counter))
     print()
     print("Single line comments: " + str(single_comments_counter))
     print()
@@ -90,7 +107,12 @@ def analyze(lines, name):
     print("Total lines: " + str(len(lines)))
     print()
     print()
-    # Prints all single line comments
+
+    # Prints all notes.
+    for key, value in note_dictionary.items():
+        print("Line " + key + " contains the note: " + value)
+
+    # Prints all single line comments.
     for key, value in single_comment_dictionary.items():
         print("Line " + key + " contains the single line comment: " + value)
 
@@ -104,9 +126,9 @@ def analyze(lines, name):
 def check_file_extension(filename):
     file_, extension = os.path.splitext(filename)
     if extension.lower() == '.cts' or extension.lower() == '.cs2':
-        valid_name_ = True
+        valid_name = True
     else:
-        valid_name_ = False
+        valid_name = False
         print("Expected file extension .cts or .cs2, found " + extension)
 
 
