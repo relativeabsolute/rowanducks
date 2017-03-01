@@ -39,7 +39,6 @@ def analyze(lines, name):
     # Before all else, check to see if valid file extension
     check_file_extension(name)
 
-    executable_counter = 0
     goto_counter = 0
 
     block_comment_counter = 0
@@ -60,45 +59,40 @@ def analyze(lines, name):
                 if re.search("(CMS-2\s*\$)", lines[j]):
                     analyze_direct(lines[i:j+1])
                     break
+        # This else handles all high-level code.
+        else:
+            current_line = re.match('(.*[0-9]+)', lines[i]).group(1)
 
-        # Checks to see if the current line is executable code.
-        if re.match(exec_pattern, lines[i]):
-            executable_counter += 1
-            current_line = re.match(exec_pattern, lines[i]).group(1)
+            # Checks to see if the current line contains a programmer's note.
+            if re.search(note_pattern, lines[i]):
+                note_counter += 1
+                # Adds note to note_dictionary.
+                comment_text = re.search(note_pattern, lines[i]).group(1)
+                note_dictionary[current_line] = comment_text
 
-        # Checks to see if the current line contains a programmer's note.
-        if re.search(note_pattern, lines[i]):
-            note_counter += 1
-            # Adds note to note_dictionary.
-            comment_text = re.search(note_pattern, lines[i]).group(1)
-            note_dictionary[current_line] = comment_text
+            # Checks first to see if a block comment is present. If not, checks for single line comments.r
+            if re.search(block_comment_pattern, lines[i]):
+                block_comment_counter += 1
+                # It loops through next lines until '$' is found (end of the comment).
+                # Then it appends the message each iteration.
+                for j in range(i, len(lines)):
+                    block_comment_line_counter += 1
+                    # TODO Maybe find a way to trim out tabs/repeating line numbers from message?
+                    comment_text += lines[j]
+                    if "$" in lines[j]:
+                        break
+                block_comment_dictionary[i] = comment_text
 
-        # Checks first to see if a block comment is present. If not, checks for single line comments.r
-        if re.search(block_comment_pattern, lines[i]):
-            block_comment_counter += 1
-            # It loops through next lines until '$' is found (end of the comment).
-            # Then it appends the message each iteration.
-            for j in range(i, len(lines)):
-                block_comment_line_counter += 1
-                # TODO Maybe find a way to trim out tabs/repeating line numbers from message?
-                comment_text += lines[j]
-                if "$" in lines[j]:
-                    break
-            block_comment_dictionary[i] = comment_text
-
-        # Checks to see if the current line contains an in-line comment.
-
-        if 'GOTO' in lines[i]:
-            # I'm not sure how to handle this yet, but the sample output keeps track of them.
-            goto_counter += 1
-            print("GOTO detected on line " + str(current_line))
+                if 'GOTO' in lines[i]:
+                    # I'm not sure how to handle this yet, but the sample output keeps track of them.
+                    goto_counter += 1
+                    print("GOTO detected on line " + str(current_line) )
 
     print()
     print("Notes: " + str(note_counter))
     print()
     print("Block comments: " + str(block_comment_counter))
     print("Block comment lines: " + str(block_comment_line_counter))
-    print("Executable lines of code: " + str(executable_counter))
     print("Total lines: " + str(len(lines)))
     print()
     print()
@@ -126,10 +120,17 @@ def check_file_extension(filename):
 def analyze_direct(lines):
     single_comments_counter = 0
     single_comment_dictionary = {}
+    executable_counter = 0
 
     for i in range(len(lines)):
         current_line = re.match(exec_pattern, lines[i]).group(1)
 
+        # Checks to see if the current line is executable code.
+        if re.match(exec_pattern, lines[i]):
+            executable_counter += 1
+            current_line = re.match(exec_pattern, lines[i]).group(1)
+
+        # Checks to see if the current line contains an in-line comment.
         if re.search(single_comment_pattern, lines[i]):
             single_comments_counter += 1
 
@@ -137,8 +138,10 @@ def analyze_direct(lines):
             comment_text = re.search(single_comment_pattern, lines[i]).group(1)
             single_comment_dictionary[current_line] = comment_text
 
+    print("Executable lines of code: " + str(executable_counter))
+    print()
     print("Single line comments: " + str(single_comments_counter))
-
+    print()
     # Prints all single line comments.
     for key, value in single_comment_dictionary.items():
         print("Line " + key + " contains the single line comment: " + value)
