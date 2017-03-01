@@ -11,8 +11,8 @@ def main():
     split_file(sample_file)
 
 
-# Splits a CMS-2Y file by newline characters and prints out each line.
-# This is just for testing right now and getting reacquainted with Python.
+# The method splits a CMS-2Y file by newline characters and prints out each line.
+# This is just for testing and getting reacquainted with Python.
 def split_file(file):
     f = open(file).read().splitlines()
     # for line in f:
@@ -20,9 +20,9 @@ def split_file(file):
     analyze(f, sample_file)
 
 
-# Analyzes given text.
-# As of now, only counts the number of executable lines and in line comments.
-# Prints out findings when complete.
+# Analyzes given text
+# Currently it only counts the number of executable lines and in line comments.
+# Prints out findings when complete
 def analyze(lines, name):
     # Before all else, check to see if valid file extension
     check_file_extension(name)
@@ -71,8 +71,9 @@ def analyze(lines, name):
         # Checks first to see if a block comment is present. If not, checks for single line comments.r
         if re.search(block_comment_pattern, lines[i]):
             block_comment_counter += 1
-            j = 0
-            # Loops through next lines until '$' is found (end of the comment). Appends to message each iteration.
+            # j = 0 (PyCharm says this is never used. I commented it out just in case.)
+            # It loops through next lines until '$' is found (end of the comment).
+            # Then it appends the message each iteration.
             for j in range(i, len(lines)):
                 block_comment_line_counter += 1
                 # TODO Maybe find a way to trim out tabs/repeating line numbers from message?
@@ -82,15 +83,16 @@ def analyze(lines, name):
             block_comment_dictionary[i] = comment_text
 
         # Checks to see if the current line contains an in-line comment.
+
         elif re.search(single_comment_pattern, lines[i]):
             single_comments_counter += 1
 
-            # Adds comment to single_comment_dictionary.
+            # Adds comment to single_comment_dictionary
             comment_text = re.search(single_comment_pattern, lines[i]).group(1)
             single_comment_dictionary[current_line] = comment_text
 
         if 'GOTO' in lines[i]:
-            # Not sure how to handle this yet, but the sample output keeps track of them.
+            # I'm not sure how to handle this yet, but the sample output keeps track of them.
             goto_counter += 1
             print("GOTO detected on line " + str(current_line))
 
@@ -114,7 +116,7 @@ def analyze(lines, name):
     for key, value in single_comment_dictionary.items():
         print("Line " + key + " contains the single line comment: " + value)
 
-    # Prints all block comments.
+    # Prints all block comments
     print()
     print("Block comments: ")
     for key, value in block_comment_dictionary.items():
@@ -122,7 +124,7 @@ def analyze(lines, name):
 
 
 def check_file_extension(filename):
-    file, extension = os.path.splitext(filename)
+    file_, extension = os.path.splitext(filename)
     if extension.lower() == '.cts' or extension.lower() == '.cs2':
         valid_name = True
     else:
