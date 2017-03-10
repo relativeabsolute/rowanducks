@@ -26,12 +26,10 @@ note_pattern = '(\'\'[\w|\s|-]*\'\')'
 def main():
     finished = False
     input_files = []
-    i = 0
     while not finished:
         current = input("Enter a file location to select file. Leave blank to finish.")
         if current is not "":
             input_files.append(current)
-            i += 1
         else:
             finished = True
 
