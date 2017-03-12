@@ -26,13 +26,11 @@ note_pattern = '(\'\'[\w|\s|-]*\'\')'
 def main():
     finished = False
     input_files = []
-    while not finished:
-        current = input("Enter a file location to select file. Leave blank to finish.")
-        if current is not "":
-            input_files.append(current)
-        else:
-            finished = True
-
+    # Takes arguments (filenames) from command line separated by spaces
+    # Could update this to take a directory and analyze all files in directory
+    #for n in range (1, len(sys.argv)):
+    #    input_files.append(sys.argv[n])
+    input_files.append("CMS2YSample.txt")
     for location in input_files:
         split_file(location)
 
@@ -78,13 +76,13 @@ def analyze(lines, name):
         if re.search('(DIRECT\s*\$)', lines[i]):
             for j in range(i, len(lines)):
                 print(lines[j])
-                if re.search("(CMS-2\s*\$)", lines[j]):
-                    analyze_direct(lines[i:j+1])
+                if re.search("(CMS-2\s*\$)", lines[j+1]):
+                    analyze_direct(lines[i:j])
+                    i = j+1 # Update loop counter so we don't analyze code block more than once
                     break
+            i = j+1 # Prevent infinite loop if code sample improperly formatted
         # This else handles all high-level code.
         else:
-            current_line = re.match('(.*\s[0-9]+)', lines[i]).group(1)
-
             if 'GOTO' in lines[i]:
                 # I'm not sure how to handle this yet, but the sample output keeps track of them.
                 goto_counter += 1
