@@ -40,8 +40,8 @@ class SourceMonitor:
         self.get_rows()
 
 def main():
-    file1 = "CMS-2_HighLevel_2.txt"
-    file2 = "CMS-2_HighLevel_Edited.txt"
+    file1 = "CMS-2_HighLevel2.txt"
+    file2 = "CMS-2_HighLevel2_Edited.txt"
 
     d1 = Diff(file1, file2)
     d1.moduleName = "CMS-2_HighLevel"

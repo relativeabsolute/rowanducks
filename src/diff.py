@@ -39,8 +39,8 @@ class Diff:
         return result
 
 if __name__ == "__main__":
-    file1 = "CMS-2_HighLevel_2.txt"
-    file2 = "CMS-2_HighLevel_Edited.txt"
+    file1 = "CMS-2_HighLevel2.txt"
+    file2 = "CMS-2_HighLevel2_Edited.txt"
 
     d = Diff(file1, file2)
     d.run_diff()
