@@ -1,10 +1,19 @@
-# Author: Matt Gimbut
+# Author: Matt Gimbut / Tom Harker
+
+# README
+# To run this program do one of the following:
+# 1. Use command line tool and pass directory name (or filename(s)) as parameter
+#       On a Mac open Terminal and navigate to this src folder. Type 'python regex.py SampleDirectory' hit enter
+# 2. On top menu go to Run->Edit Configurations, and add SampleDirectory as a script parameter and hit Apply and OK
+
 import re
 import os
+import sys
+from collections import OrderedDict
+from CMS2FileInfo import CMS2FileInfo
 
-
-sample_file = "CMS2YSample.txt"
-sample_HL_file = "CMS-2_HighLevel_2.txt"
+sample_file = "/SampleDirectory/CMS2YSample.txt"
+sample_HL_file = "/SampleDirectory/CMS-2_HighLevel_2.txt"
 valid_name = False
 
 # Accepts 'X' followed by any number of digits or 'A/' followed by any number of digits.
@@ -26,27 +35,40 @@ note_pattern = '(\'\'[\w|\s|-]*\'\')'
 def main():
     finished = False
     input_files = []
+    list_CMS2FileInfo = []
     # Takes arguments (filenames) from command line separated by spaces
     # Could update this to take a directory and analyze all files in directory
-    #for n in range (1, len(sys.argv)):
-    #    input_files.append(sys.argv[n])
-    input_files.append("CMS2YSample.txt")
+    for n in range (1, len(sys.argv)):
+        if os.path.isfile(sys.argv[n]):
+            input_files.append(sys.argv[n])
+            #print sys.argv[n]
+        elif os.path.isdir(sys.argv[n]):
+            list = getFilesFromDir(sys.argv[n])
+            for file in list:
+                input_files.append(file)
+
     for location in input_files:
-        split_file(location)
+        list_CMS2FileInfo.append(split_file(location))
+    for fileData in list_CMS2FileInfo:
+        print fileData.printString()
 
+# TODO return files in subdirectories
+# TODO only return files with correct extension
+def getFilesFromDir(directory):
+    return [os.path.join(directory,fn) for fn in next(os.walk(directory))[2]]
 
-# The method splits a CMS-2Y file by newline characters and prints out each line.
-# This is just for testing and getting reacquainted with Python.
+# The method splits a CMS-2Y file by newline characters and sends it to analyze().
+# Returns the OrderedDict sent back by analyze().
 def split_file(file):
     f = open(file).read().splitlines()
     # for line in f:
     # print(line)
-    analyze(f, sample_file)
+    return analyze(f, file)
 
 
 # Analyzes given text
 # Currently it only counts the number of executable lines and in line comments.
-# Prints out findings when complete
+# Returns findings in an OrderedDict on completion
 def analyze(lines, name):
     # Before all else, check to see if valid file extension
     check_file_extension(name)
@@ -67,6 +89,7 @@ def analyze(lines, name):
 
     # Changed the "for in" loop to while so we can change loop counter when needed (see lines 100, 115)
     i = 0
+    fileInfo = OrderedDict()
     while (i < len(lines)):
         current_line = ""
         comment_text = ""
@@ -75,9 +98,8 @@ def analyze(lines, name):
         # Detects Direct CMS-2 code blocks and sends the entire block to be analyzed.
         if re.search('(DIRECT\s*\$)', lines[i]):
             for j in range(i, len(lines)):
-                print(lines[j])
                 if re.search("(CMS-2\s*\$)", lines[j+1]):
-                    analyze_direct(lines[i:j])
+                    fileInfo.update(analyze_direct(lines[i:j]))
                     i = j+1 # Update loop counter so we don't analyze code block more than once
                     break
             i = j+1 # Prevent infinite loop if code sample improperly formatted
@@ -86,7 +108,7 @@ def analyze(lines, name):
             if 'GOTO' in lines[i]:
                 # I'm not sure how to handle this yet, but the sample output keeps track of them.
                 goto_counter += 1
-                print("GOTO detected on line " + str(current_line))
+                #print("GOTO detected on line " + str(current_line))
 
             # Checks to see if the current line contains a programmer's note.
             if re.search(note_pattern, lines[i]):
@@ -127,29 +149,19 @@ def analyze(lines, name):
                         break
             # Loop counter
             i+=1
+    fileInfo["Go-To Statements"] = goto_counter
+    fileInfo["Notes"] = note_counter
+    fileInfo["Block comments"] = block_comment_counter
+    fileInfo["Block comment lines"] = block_comment_line_counter
+    fileInfo["High Level CMS2 Single Line Statements"] = HL_statement_counter
+    fileInfo["Multi-line High Level CMS2 Statements"] = HL_multi_statement_counter
+    fileInfo["Lines of Multi-line High Level CMS2 Statements"] = HL_multi_statement_lines
+    fileInfo["Total lines"] = len(lines)
 
-    print
-    print("Notes: " + str(note_counter))
-    print
-    print("Block comments: " + str(block_comment_counter))
-    print("Block comment lines: " + str(block_comment_line_counter))
-    print("Single line statements of High Level CMS: " + str(HL_statement_counter))
-    print("Multi-line statements of High Level CMS: " + str(HL_multi_statement_counter))
-    print("Lines of multi-line statements: " + str(HL_multi_statement_lines))
-    print
-    print("Total lines: " + str(len(lines)))
-    print
-    print
-
-    # Prints all notes.
-    for key, value in note_dictionary.items():
-        print("Line " + key + " contains the note: " + value)
-
-    # Prints all block comments
-    print
-    print("Block comments: ")
-    for key, value in block_comment_dictionary.items():
-        print(str(key) + ": " + value)
+    # Don't think we need this information anymore
+    # fileInfo["Block Comment Dictionary"] = block_comment_counter
+    # fileInfo["Note Dictionary"] = note_dictionary
+    return CMS2FileInfo(name, fileInfo)
 
 
 def check_file_extension(filename):
@@ -160,8 +172,10 @@ def check_file_extension(filename):
         valid_name = False
         print("Expected file extension .cts or .cs2, found " + extension + " in " + filename)
 
-
+# Returns OrderedDict of findings
 def analyze_direct(lines):
+    info = OrderedDict()
+
     single_comments_counter = 0
     single_comment_dictionary = {}
     executable_counter = 0
@@ -182,14 +196,9 @@ def analyze_direct(lines):
             comment_text = re.search(single_comment_pattern, lines[i]).group(1)
             single_comment_dictionary[current_line] = comment_text
 
-    print("Executable lines of Direct CMS2: " + str(executable_counter))
-    print
-    print("Single line comments: " + str(single_comments_counter))
-    print
-    # Prints all single line comments.
-    for key, value in single_comment_dictionary.items():
-        print("Line " + key + " contains the single line comment: " + value)
-
+    info["Executable CMS2 lines"] = executable_counter
+    info["Single line Direct CMS2 comments"] = single_comments_counter
+    return info
 
 # TODO everything
 def compare_files(original, modified):
