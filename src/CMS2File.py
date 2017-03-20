@@ -46,6 +46,12 @@ class CMS2File:
         self.Total_exec_stmts = HL_exec_stmts + Direct_exec_stmts
         self.Total_src_lines = HL_exec_lines + HL_data_lines + HL_comment_lines + HL_noncomment_lines + Direct_comment_lines
 
+    def recalculateTotals(self):
+        CMS2File.Total_src_lines = self.HL_exec_lines + self.HL_data_lines + self.HL_comment_lines + self.HL_noncomment_lines + self.Direct_comment_lines
+        CMS2File.Total_exec_stmts = self.HL_exec_stmts + self.Direct_exec_stmts
+        x = self.HL_exec_stmts + self.Direct_exec_stmts
+        print "Made it to recalc Totals!"
+
     # Define all "getters" and "setters"
     #----------------------------
     @property
@@ -72,7 +78,7 @@ class CMS2File:
     def HL_exec_stmts(self, value):
         self._HL_exec_stmts = value
         # Recalculate total exec stmts
-        self.Total_exec_stmts = self.HL_exec_stmts + self.Direct_exec_stmts
+        #self.Total_exec_stmts = self.HL_exec_stmts + self.Direct_exec_stmts
     #----------------------------
     @property
     def HL_exec_lines(self):
@@ -82,7 +88,7 @@ class CMS2File:
     def HL_exec_lines(self, value):
         self._HL_exec_lines = value
         # Recalculate total src lines
-        self.Total_src_lines = self.HL_exec_lines + self.HL_data_lines + self.HL_comment_lines + self.HL_noncomment_lines + self.Direct_comment_lines
+        #self.Total_src_lines = self.HL_exec_lines + self.HL_data_lines + self.HL_comment_lines + self.HL_noncomment_lines + self.Direct_comment_lines
 
     #----------------------------
     @property
@@ -101,7 +107,7 @@ class CMS2File:
     def HL_data_lines(self, value):
         self._HL_data_lines = value
         # Recalculate total src lines
-        self.Total_src_lines = self.HL_exec_lines + self.HL_data_lines + self.HL_comment_lines + self.HL_noncomment_lines + self.Direct_comment_lines
+        #self.Total_src_lines = self.HL_exec_lines + self.HL_data_lines + self.HL_comment_lines + self.HL_noncomment_lines + self.Direct_comment_lines
     #----------------------------
     @property
     def HL_comment_stmts(self):
@@ -119,7 +125,7 @@ class CMS2File:
     def HL_comment_lines(self, value):
         self._HL_comments_lines = value
         # Recalculate total src lines
-        self.Total_src_lines = self.HL_exec_lines + self.HL_data_lines + self.HL_comment_lines + self.HL_noncomment_lines + self.Direct_comment_lines
+        #self.Total_src_lines = self.HL_exec_lines + self.HL_data_lines + self.HL_comment_lines + self.HL_noncomment_lines + self.Direct_comment_lines
     #----------------------------
     @property
     def HL_noncomment_lines(self):
@@ -129,7 +135,7 @@ class CMS2File:
     def HL_noncomment_lines(self, value):
         self._HL_noncomment_lines = value
         # Recalculate total src lines
-        self.Total_src_lines = self.HL_exec_lines + self.HL_data_lines + self.HL_comment_lines + self.HL_noncomment_lines + self.Direct_comment_lines
+        #self.Total_src_lines = self.HL_exec_lines + self.HL_data_lines + self.HL_comment_lines + self.HL_noncomment_lines + self.Direct_comment_lines
     #----------------------------
     @property
     def HL_other_stmts(self):
@@ -147,7 +153,8 @@ class CMS2File:
     def Direct_exec_stmts(self, value):
         self._Direct_exec_stmts = value
         # Recalculate total exec stmts
-        self.Total_exec_stmts = self.HL_exec_stmts + self.Direct_exec_stmts
+        #self.Total_exec_stmts = self.HL_exec_stmts + self.Direct_exec_stmts
+        self.recalculateTotals()
     #----------------------------
     @property
     def Direct_data_stmts(self):
@@ -163,7 +170,10 @@ class CMS2File:
     def Direct_comment_lines(self, value):
         self._Direct_comments_lines = value
         # Recalculate total src lines
-        self.Total_src_lines = self.HL_exec_lines + self.HL_data_lines + self.HL_comment_lines + self.HL_noncomment_lines + self.Direct_comment_lines
+        #self.Total_src_lines = self.HL_exec_lines + self.HL_data_lines + self.HL_comment_lines + self.HL_noncomment_lines + self.Direct_comment_lines
+        recalculateTotals()
+
+    #TODO: Optimize recalculation of src/exec lines by writing a method and calling it when necessary.
 
     # ------------------TOTAL--------------------
 
