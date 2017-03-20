@@ -53,7 +53,7 @@ class Report:
         version = "0\t\t"
 
         # We may need to separate string to fill in the number of tabs and keys in between.
-        categories_header = "\tComponent\t"
+        categories_header = "\t\tComponent\t"
         fields = "\t"
 
         categories = ""
@@ -72,7 +72,7 @@ class Report:
                 categories_start = categories_length
 
         self.header_string = date_title + version + "\t" + section_string + "\n" + categories_header + categories
-        self.header_string += "\nMX Delimt\n"
+        self.header_string += "\n"
         self.header_string += "\tName\tType" + fields
 
         return self.header_string
@@ -80,9 +80,10 @@ class Report:
     # Return a string representation of this Report, a la java toString
     def __str__(self):
         result = "Report:\n"
-        result += "Header string:\n"
-        result += "----------------\n"
-        result += self.header_string
+        # Just testing stuff?
+        # result += "Header string:\n"
+        # result += "----------------\n"
+        # result += self.header_string
         result += "\n----------------\n"
         result += "Complete report string:\n"
         result += "----------------"
@@ -128,8 +129,13 @@ def main():
     gen = Report(components)
     afterTime = time.time()
     print(str(gen))
+
+    # Sample data string for the sprint review
+    # TODO use python module tabulate to make report table
+    print("CMS2YSample\tSYS\t\t1\t\t2\t\t3\t\t3\t\t5\t\t6\t\t7\t\t8\t\t\t9\t\t10\t\t11\t\t\t12\t\t13\t\t\t14\t\t15\t\t16")
+    print("CMS2YHL  \tSYS\t\t1\t\t2\t\t3\t\t3\t\t5\t\t6\t\t7\t\t8\t\t\t9\t\t10\t\t11\t\t\t12\t\t13\t\t\t14\t\t15\t\t16")
     # TODO: convert to human readable time format
-    print("Before time = " + str(time.ctime(beforeTime)))
+    print("\nBefore time = " + str(time.ctime(beforeTime)))
     print("After time = " + str(time.ctime(afterTime)))
     print("Time spent generating report = " + str(afterTime - beforeTime))
 
