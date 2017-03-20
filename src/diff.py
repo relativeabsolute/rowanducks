@@ -8,7 +8,7 @@ class Diff:
         self.file2 = file2
     
     def run_diff(self):
-        self.diff = difflib.ndiff(open(file1).readlines(),open(file2).readlines())
+        self.diff = difflib.ndiff(open(self.file1).readlines(),open(self.file2).readlines())
 
         # Accepts a '+' followed by a space and any number of any characters until line ends to extract in-line comment.
         addition_pattern = '(\+ .*)'
