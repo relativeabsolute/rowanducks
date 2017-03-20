@@ -18,12 +18,12 @@ class SourceMonitor:
         class_name = "///CLASS NAME HERE///"
         self.header_string += "\t\t\t\t\t\t\t" + class_name + "\n"
 
-        column_names = "MODULE\t\t\t\t\t|FILE STATUS|\tINITIAL SIZE\t| CPCR\t\t\t"
+        column_names = "MODULE\t\t\t\t\t\t|FILE STATUS|\tINITIAL SIZE\t| CPCR\t\t\t"
         column_names += "ADDITIONS\tMODIFICATIONS\t|\tDELETIONS\n"
         self.header_string += column_names
 
-        underline_str = "----------------------------------------|-----------|-------------------|"
-        underline_str += "-------------------------------------------------------|----------------"
+        underline_str = "----------------------------------------|-------------------|--------------"
+        underline_str += "-----------------------------|----------------"
         self.header_string += underline_str
 
     def get_rows(self):
@@ -31,7 +31,7 @@ class SourceMonitor:
         self.main_string = ""
         for diff in self.diffs:
             self.main_string += diff.moduleName + ":\n"
-            self.main_string += "\t" + diff.file1 + "\t\t| CHANGED   |\t\t\t| UNSPECIFIED\t"
+            self.main_string += "\t" + diff.file1 + "\t| CHANGED   |\t\t\t\t\t| UNSPECIFIED\t"
 
 
     def __init__(self, diffs):
