@@ -6,6 +6,7 @@ class Diff:
     def __init__(self, file1, file2):
         self.file1 = file1
         self.file2 = file2
+        self.moduleName = ""
     
     def run_diff(self):
         self.diff = difflib.ndiff(open(self.file1).readlines(),open(self.file2).readlines())
