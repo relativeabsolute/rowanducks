@@ -1,5 +1,6 @@
 import difflib
 import re
+from CMS2FileDiff import CMS2FileDiff
 
 class Diff:
     # TODO: define module associated with the files
@@ -11,26 +12,59 @@ class Diff:
     def run_diff(self):
         self.diff = difflib.ndiff(open(self.file1).readlines(),open(self.file2).readlines())
 
-        # Accepts a '+' followed by a space and any number of any characters until line ends to extract in-line comment.
+        # Accepts a '+' followed by a space.
         addition_pattern = '(\+ .*)'
-        self.additions = 0
-        # Accepts a '-' followed by a space and any number of any characters until line ends to extract in-line comment.
+        self.additions = {"Instructions": 0, "Comments":0}
+        self.instructionAdditions = 0
+        self.commentAdditions = 0
+        # Accepts a '-' followed by a space.
         deletion_pattern = '(\- .*)'
-        self.deletions = 0
-        # Accepts a '?' followed by a space and any number of any characters until line ends to extract in-line comment.
+        self.deletions = {"Instructions": 0, "Comments":0}
+        self.instructionDeletions = 0
+        self.commentDeletions = 0
+        # Accepts a '?' followed by a space.
         modification_pattern = '(\? .*)'
-        self.modifications = 0
+        self.modifications = {"Instructions": 0, "Comments":0}
+        self.instructionModifications = 0
+        self.commentModifications = 0
 
+        statement_pattern = '(.*\$)'
+        direct_single_comment_pattern = '(\. .*)'
+        block_comment_pattern = '([0-9]*\sCOMMENT.*)'
         for n in self.diff:
             if re.search(addition_pattern, n):
-                self.additions+=1
+                # Order important
+                if re.search(block_comment_pattern, n):
+                    self.additions["Comments"]+=1
+                elif re.search(direct_single_comment_pattern, n):
+                    self.additions["Comments"] += 1
+                elif re.search(statement_pattern, n):
+                    self.additions["Instructions"] += 1
+                else:
+                    self.additions["Comments"] += 1
             elif re.search(deletion_pattern, n):
-                self.deletions+=1
+                if re.search(block_comment_pattern, n):
+                    self.deletions["Comments"] += 1
+                elif re.search(direct_single_comment_pattern, n):
+                    self.deletions["Comments"] += 1
+                elif re.search(statement_pattern, n):
+                    self.deletions["Instructions"] += 1
+                else:
+                    self.deletions["Comments"] += 1
             elif re.search(modification_pattern, n):
-                self.modifications+=1
+                if re.search(block_comment_pattern, n):
+                    self.modifications["Comments"] += 1
+                elif re.search(direct_single_comment_pattern, n):
+                    self.modifications["Comments"] += 1
+                elif re.search(statement_pattern, n):
+                    self.modifications["Instructions"] += 1
+                else:
+                    self.modifications["Comments"] += 1
         # Addition/deletion patterns also show for self.modifications. Prevent double counting.
-        self.additions-=self.modifications
-        self.deletions-=self.modifications
+        self.additions["Instructions"]-=self.modifications["Instructions"]
+        self.deletions["Instructions"]-=self.modifications["Instructions"]
+        self.additions["Comments"]-=self.modifications["Comments"]
+        self.deletions["Comments"]-=self.modifications["Comments"]
 
     def __str__(self):
         result = "Additions: " + str(self.additions) + "\n"
