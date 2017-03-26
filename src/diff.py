@@ -26,6 +26,7 @@ class Diff:
     def getFilesFromDir(self, directory):
         return [os.path.join(directory, fn) for fn in next(os.walk(directory))[2]]
 
+    # Reads sys arguments to get files to run diff on
     def readInput(self):
         for n in range(1, len(sys.argv)):
             if os.path.isfile(sys.argv[n]):
@@ -36,6 +37,7 @@ class Diff:
                 for file in list:
                     self.input_files.append(file)
 
+    # Analysis method. Returns a CMS2FileDiff
     def analyze(self, filename, sample1, sample2):
         diff = difflib.ndiff(sample1, sample2)
 
@@ -95,6 +97,7 @@ class Diff:
 
         return CMS2FileDiff(filename, additions, modifications, deletions)
 
+    # Run diff between local file and same file from latest commit
     def run_diff_on_latest_commit(self):
         repo = git.Repo('~/sweng/rowanducks/')
         for file in self.input_files:
