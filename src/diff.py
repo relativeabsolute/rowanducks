@@ -1,155 +1,127 @@
 import difflib
 import re
 import git
+import sys
+import os
 from CMS2FileDiff import CMS2FileDiff
+
+# README
+# To run this program do one of the following:
+# 1. Use command line tool and pass directory name (or filename(s)) as parameter
+#       On a Mac open Terminal and navigate to this src folder. Type 'python diff.py SampleDirectory' hit enter
+# 2. On top menu go to Run->Edit Configurations, and add SampleDirectory as a script parameter and hit Apply and OK
+
+# To see sample output, make changes to the CMS2 files and save them before running diff.py
 
 class Diff:
     # TODO: define module associated with the files
-    def __init__(self, file1, file2):
-        self.file1 = file1
-        self.file2 = file2
+    def __init__(self):
         self.moduleName = ""
+        self.diff_list = []
+        self.input_files = []
+        self.CPCR = []
 
-    def run_diff_on_commit(self):
-        repo = git.Repo('~/sweng/rowanducks/')
-        folder = "src/"
-        file = "CMS-2_HighLevel2.txt"
+    # TODO return files in subdirectories
+    # TODO only return files with correct extension
+    def getFilesFromDir(self, directory):
+        return [os.path.join(directory, fn) for fn in next(os.walk(directory))[2]]
 
-        # Get raw text of file from latest commit
-        unicode = repo.git.show('HEAD:'+folder+file)
-        # Split by line into arry
-        oldVersionFile = unicode.encode('utf-8').strip().split('\n')
-        # Add delimiter back in for comparison purposes
-        for line in range(0, len(oldVersionFile)):
-            oldVersionFile[line]+='\n'
-        t = open(file).readlines()
-        self.diff = difflib.ndiff(open(file).readlines(), oldVersionFile)
+    def readInput(self):
+        for n in range(1, len(sys.argv)):
+            if os.path.isfile(sys.argv[n]):
+                self.input_files.append(sys.argv[n])
+                # print sys.argv[n]
+            elif os.path.isdir(sys.argv[n]):
+                list = self.getFilesFromDir(sys.argv[n])
+                for file in list:
+                    self.input_files.append(file)
+
+    def analyze(self, filename, sample1, sample2):
+        diff = difflib.ndiff(sample1, sample2)
 
         # Accepts a '+' followed by a space.
         addition_pattern = '(\+ .*)'
-        self.additions = {"Instructions": 0, "Comments":0}
-        self.instructionAdditions = 0
-        self.commentAdditions = 0
+        additions = {"Instructions": 0, "Comments": 0}
+
         # Accepts a '-' followed by a space.
         deletion_pattern = '(\- .*)'
-        self.deletions = {"Instructions": 0, "Comments":0}
-        self.instructionDeletions = 0
-        self.commentDeletions = 0
+        deletions = {"Instructions": 0, "Comments": 0}
+
         # Accepts a '?' followed by a space.
         modification_pattern = '(\? .*)'
-        self.modifications = {"Instructions": 0, "Comments":0}
-        self.instructionModifications = 0
-        self.commentModifications = 0
+        modifications = {"Instructions": 0, "Comments": 0}
 
         statement_pattern = '(.*\$\n)'
         direct_single_comment_pattern = '(\. .*)'
         block_comment_pattern = '([0-9]*\sCOMMENT.*)'
-        for n in self.diff:
+        # Used to help classify modification as instructions/comments
+        previous = ""
+        for n in diff:
             if re.search(addition_pattern, n):
                 # Order important
                 if re.search(block_comment_pattern, n):
-                    self.additions["Comments"]+=1
-                    self.previous = "Comments"
+                    additions["Comments"] += 1
+                    previous = "Comments"
                 elif re.search(direct_single_comment_pattern, n):
-                    self.additions["Comments"] += 1
-                    self.previous = "Comments"
+                    additions["Comments"] += 1
+                    previous = "Comments"
                 elif re.search(statement_pattern, n):
-                    self.additions["Instructions"] += 1
-                    self.previous = "Instructions"
+                    additions["Instructions"] += 1
+                    previous = "Instructions"
                 else:
-                    self.additions["Comments"] += 1
-                    self.previous = "Comments"
+                    additions["Comments"] += 1
+                    previous = "Comments"
             elif re.search(deletion_pattern, n):
+                print(n)
                 if re.search(block_comment_pattern, n):
-                    self.deletions["Comments"] += 1
-                    self.previous = "Comments"
+                    deletions["Comments"] += 1
+                    previous = "Comments"
                 elif re.search(direct_single_comment_pattern, n):
-                    self.deletions["Comments"] += 1
-                    self.previous = "Comments"
+                    deletions["Comments"] += 1
+                    previous = "Comments"
                 elif re.search(statement_pattern, n):
-                    self.deletions["Instructions"] += 1
-                    self.previous = "Instructions"
+                    deletions["Instructions"] += 1
+                    previous = "Instructions"
                 else:
-                    self.deletions["Comments"] += 1
-                    self.previous = "Comments"
+                    deletions["Comments"] += 1
+                    previous = "Comments"
             elif re.search(modification_pattern, n):
-                self.modifications[self.previous]+=1
+                modifications[previous] += 1
         # Addition/deletion patterns also show for self.modifications. Prevent double counting.
-        self.additions["Instructions"]-=self.modifications["Instructions"]
-        self.deletions["Instructions"]-=self.modifications["Instructions"]
-        self.additions["Comments"]-=self.modifications["Comments"]
-        self.deletions["Comments"]-=self.modifications["Comments"]
+        additions["Instructions"] -= modifications["Instructions"]
+        deletions["Instructions"] -= modifications["Instructions"]
+        additions["Comments"] -= modifications["Comments"]
+        deletions["Comments"] -= modifications["Comments"]
 
-    def run_diff(self):
-        self.diff = difflib.ndiff(open(self.file1).readlines(),open(self.file1).readlines())
+        return CMS2FileDiff(filename, additions, modifications, deletions)
 
-        # Accepts a '+' followed by a space.
-        addition_pattern = '(\+ .*)'
-        self.additions = {"Instructions": 0, "Comments":0}
-        self.instructionAdditions = 0
-        self.commentAdditions = 0
-        # Accepts a '-' followed by a space.
-        deletion_pattern = '(\- .*)'
-        self.deletions = {"Instructions": 0, "Comments":0}
-        self.instructionDeletions = 0
-        self.commentDeletions = 0
-        # Accepts a '?' followed by a space.
-        modification_pattern = '(\? .*)'
-        self.modifications = {"Instructions": 0, "Comments":0}
-        self.instructionModifications = 0
-        self.commentModifications = 0
+    def run_diff_on_latest_commit(self):
+        repo = git.Repo('~/sweng/rowanducks/')
+        for file in self.input_files:
+            # Get raw text of file from latest commit
+            unicode = repo.git.show('HEAD:'+'src/'+file)
+            # Split by line into arry
+            oldVersionFile = unicode.encode('utf-8').strip().split('\n')
+            # Add delimiter back in for comparison purposes
+            for line in range(0, len(oldVersionFile)):
+                oldVersionFile[line]+='\n'
 
-        statement_pattern = '(.*\$)'
-        direct_single_comment_pattern = '(\. .*)'
-        block_comment_pattern = '([0-9]*\sCOMMENT.*)'
-        for n in self.diff:
-            if re.search(addition_pattern, n):
-                # Order important
-                if re.search(block_comment_pattern, n):
-                    self.additions["Comments"]+=1
-                    self.previous = "Comments"
-                elif re.search(direct_single_comment_pattern, n):
-                    self.additions["Comments"] += 1
-                    self.previous = "Comments"
-                elif re.search(statement_pattern, n):
-                    self.additions["Instructions"] += 1
-                    self.previous = "Instructions"
-                else:
-                    self.additions["Comments"] += 1
-                    self.previous = "Comments"
-            elif re.search(deletion_pattern, n):
-                if re.search(block_comment_pattern, n):
-                    self.deletions["Comments"] += 1
-                    self.previous = "Comments"
-                elif re.search(direct_single_comment_pattern, n):
-                    self.deletions["Comments"] += 1
-                    self.previous = "Comments"
-                elif re.search(statement_pattern, n):
-                    self.deletions["Instructions"] += 1
-                    self.previous = "Instructions"
-                else:
-                    self.deletions["Comments"] += 1
-                    self.previous = "Comments"
-            elif re.search(modification_pattern, n):
-                self.modifications[self.previous]+=1
-        # Addition/deletion patterns also show for self.modifications. Prevent double counting.
-        self.additions["Instructions"]-=self.modifications["Instructions"]
-        self.deletions["Instructions"]-=self.modifications["Instructions"]
-        self.additions["Comments"]-=self.modifications["Comments"]
-        self.deletions["Comments"]-=self.modifications["Comments"]
+            self.diff_list.append(self.analyze(file, oldVersionFile, open(file).readlines()))
 
     def __str__(self):
-        result = "Additions: " + str(self.additions) + "\n"
-        result += "Modifications: " + str(self.modifications) + "\n"
-        result += "Deletions: " + str(self.deletions) + "\n"
+        result = ""
+        for fileInfo in self.diff_list:
+            result += "File: "
+            result += str(fileInfo.filename) + "\n"
+            result += "Additions: " + str(fileInfo.additions) + "\n"
+            result += "Modifications: " + str(fileInfo.modifications) + "\n"
+            result += "Deletions: " + str(fileInfo.deletions) + "\n" + "\n"
         return result
 
 if __name__ == "__main__":
-    file1 = "CMS-2_HighLevel2.txt"
-    file2 = "CMS-2_HighLevel2_Edited.txt"
 
-    d = Diff(file1, file2)
-    d.run_diff_on_commit()
-    # d.run_diff()
+    d = Diff()
+    d.readInput()
+    d.run_diff_on_latest_commit()
     print("Diff results")
     print(str(d))
