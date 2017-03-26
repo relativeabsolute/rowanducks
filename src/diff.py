@@ -1,5 +1,6 @@
 import difflib
 import re
+import git
 from CMS2FileDiff import CMS2FileDiff
 
 class Diff:
@@ -8,7 +9,15 @@ class Diff:
         self.file1 = file1
         self.file2 = file2
         self.moduleName = ""
-    
+
+    def run_diff2(self):
+        repo = git.Repo('~/sweng/rowanducks/')
+        file = "src/CMS2YSample.txt"
+
+        commits_touching_path = list(repo.iter_commits())
+
+        print repo.git.diff(commits_touching_path[2], commits_touching_path[0], file)
+
     def run_diff(self):
         self.diff = difflib.ndiff(open(self.file1).readlines(),open(self.file2).readlines())
 
@@ -77,6 +86,7 @@ if __name__ == "__main__":
     file2 = "CMS-2_HighLevel2_Edited.txt"
 
     d = Diff(file1, file2)
-    d.run_diff()
+    d.run_diff2()
+    # d.run_diff()
     print("Diff results")
     print(str(d))
