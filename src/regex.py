@@ -1,4 +1,4 @@
-# Author: Matt Gimbut / Tom Harker
+# Author: Matt Gimbut / Tom Harker / Chris Curreri
 
 # README
 # To run this program do one of the following:
@@ -27,6 +27,10 @@ single_comment_pattern = '(\. .*)'
 
 # Accepts any digits followed by any number of white spaces, followed by 'COMMENT', followed by any characters.
 block_comment_pattern = '([0-9]*\sCOMMENT.*)'
+
+
+# The three major types of data statements are switches, variables, and aggregates
+data_statement_pattern = '((.*SET.*TO.*\$)|(.*SWITCH.*\$.*END-SWITCH.*\$)|(.*FIELD\b\S*\b.*\$))'
 
 # Accepts two single apostrophes (''), followed by any characters/digits, followed by two single apostrophes.
 note_pattern = '(\'\'[\w|\s|-]*\'\')'
@@ -86,6 +90,8 @@ def analyze(lines, name):
     HL_multi_statement_lines = 0
     HL_statement_counter = 0
 
+    HL_data_statement_counter = 0
+
 
     # Changed the "for in" loop to while so we can change loop counter when needed (see lines 100, 115)
     i = 0
@@ -116,6 +122,10 @@ def analyze(lines, name):
                 # Adds note to note_dictionary.
                 comment_text = re.search(note_pattern, lines[i]).group(1)
                 note_dictionary[current_line] = comment_text
+
+            # Checks to see if current line has a Data statement
+            if re.search(data_statement_pattern, lines[i]):
+                HL_data_statement_counter += 1
 
             # Checks first to see if a block comment is present. If not, checks for single line comments.
             # Using re.IGNORECASE because some comments are in lowercase in the sample
@@ -156,6 +166,7 @@ def analyze(lines, name):
     fileInfo["High Level CMS2 Single Line Statements"] = HL_statement_counter
     fileInfo["Multi-line High Level CMS2 Statements"] = HL_multi_statement_counter
     fileInfo["Lines of Multi-line High Level CMS2 Statements"] = HL_multi_statement_lines
+    fileInfo["Lines containing High Level Data Statements"] = HL_data_statement_counter
     fileInfo["Total lines"] = len(lines)
 
     # Don't think we need this information anymore
