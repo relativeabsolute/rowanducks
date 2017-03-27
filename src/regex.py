@@ -159,6 +159,7 @@ def analyze(lines, name):
                         break
             # Loop counter
             i+=1
+    fileInfo["Number of Lines"] = len(lines)
     fileInfo["Go-To Statements"] = goto_counter
     fileInfo["Notes"] = note_counter
     fileInfo["Block comments"] = block_comment_counter
