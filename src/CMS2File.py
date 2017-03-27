@@ -49,7 +49,7 @@ class CMS2File:
     def recalculateTotals(self):
         CMS2File.Total_src_lines = self.HL_exec_lines + self.HL_data_lines + self.HL_comment_lines + self.HL_noncomment_lines + self.Direct_comment_lines
         CMS2File.Total_exec_stmts = self.HL_exec_stmts + self.Direct_exec_stmts
-        print "Made it to recalc totals!"
+        print ("Made it to recalc totals!")
 
     # Define all "getters" and "setters"
     #----------------------------

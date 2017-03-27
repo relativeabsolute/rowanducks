@@ -54,7 +54,7 @@ def main():
     for location in input_files:
         list_CMS2FileInfo.append(split_file(location))
     for fileData in list_CMS2FileInfo:
-        print fileData.printString()
+        print (fileData.printString())
 
 # TODO return files in subdirectories
 # TODO only return files with correct extension
