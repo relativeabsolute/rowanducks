@@ -30,6 +30,17 @@ single_comment_pattern = '(\. .*)'
 # Accepts any digits followed by any number of white spaces, followed by 'COMMENT', followed by any characters.
 block_comment_pattern = '([0-9]*\sCOMMENT.*)'
 
+# Accepts any characters followed by 'SYS-PROC' followed by any characters and a '$'
+direct_start_procedure_pattern = '(\.*SYS-PROC\s*\$)'
+
+# Accepts any characters followed by 'END-SYS-PROC' followed by any characters and a '$'
+direct_end_procedure_pattern = '(\.*END-SYS-PROC.*\$)'
+
+# Accepts any characters followed by 'PROCEDURE' followed by any characters and a '$'
+HL_start_procedure_pattern = '(\.*PROCEDURE.*\$)'
+
+# Accepts any characters followed by 'RETURN' followed by any characters and a '$'
+HL_end_procedure_pattern = '(\.*RETURN.*\$)'
 
 # The three major types of data statements are switches, variables, and aggregates
 data_statement_pattern = '((.*SET.*TO.*\$)|(.*SWITCH.*\$.*END-SWITCH.*\$)|(.*FIELD\b\S*\b.*\$))'
