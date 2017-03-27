@@ -28,7 +28,7 @@ class CMS2File:
     def __init__(self, name, type, HL_exec_stmts, HL_exec_lines, HL_data_stmts,
                  HL_data_lines, HL_comment_stmts, HL_comment_lines, HL_noncomment_lines,
                  HL_other_stmts, Direct_exec_stmts, Direct_data_stmts,
-                 Direct_comment_lines):
+                 Direct_comment_lines, timestamp):
         self.name = name
         self.type = type
         self.HL_exec_stmts = HL_exec_stmts
@@ -42,6 +42,7 @@ class CMS2File:
         self.Direct_exec_stmts = Direct_exec_stmts
         self.Direct_data_stmts = Direct_data_stmts
         self.Direct_comment_lines = Direct_comment_lines
+        self.timestamp = timestamp
 
         self.Total_exec_stmts = HL_exec_stmts + Direct_exec_stmts
         self.Total_src_lines = HL_exec_lines + HL_data_lines + HL_comment_lines + HL_noncomment_lines + Direct_comment_lines
@@ -49,7 +50,7 @@ class CMS2File:
     def recalculateTotals(self):
         CMS2File.Total_src_lines = self.HL_exec_lines + self.HL_data_lines + self.HL_comment_lines + self.HL_noncomment_lines + self.Direct_comment_lines
         CMS2File.Total_exec_stmts = self.HL_exec_stmts + self.Direct_exec_stmts
-        print ("Made it to recalc totals!")
+        print("Made it to recalc totals!")
 
     # Define all "getters" and "setters"
     #----------------------------
