@@ -55,7 +55,7 @@ def main():
     list_CMS2FileInfo = []
     # Takes arguments (filenames) from command line separated by spaces
     # Could update this to take a directory and analyze all files in directory
-    for n in range (1, len(sys.argv)):
+    for n in range(1, len(sys.argv)):
         if os.path.isfile(sys.argv[n]):
             input_files.append(sys.argv[n])
             # print sys.argv[n]
@@ -141,7 +141,7 @@ def analyze(lines, name):
             if re.match(HL_start_procedure_pattern, lines[i]):
                 for j in range(i, len(lines)):
                     if re.search(HL_end_procedure_pattern, lines[j + 1]):
-                        if j - i >= 250:
+                        if j - i > 250:
                             procedure_over_250 += 1
                         break
 
@@ -238,7 +238,7 @@ def analyze_direct(lines, procedure_over_250):
         if re.match(direct_start_procedure_pattern, lines[i]):
             for j in range(i, len(lines)):
                 if re.search(direct_end_procedure_pattern, lines[j+1]):
-                    if j - i >= 250:
+                    if j - i > 250:
                         procedure_over_250 += 1
                     break
 
