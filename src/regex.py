@@ -106,7 +106,8 @@ def analyze(lines, name):
     HL_statement_counter = 0
 
     HL_data_statement_counter = 0
-    procedure_over_250 = 0
+    procedure_over_250 = []
+    procedure_230_250 = []
 
     # Changed the "for in" loop to while so we can change loop counter when needed (see lines 100, 115)
     i = 0
@@ -120,7 +121,7 @@ def analyze(lines, name):
         if re.search('(DIRECT\s*\$)', lines[i]):
             for j in range(i, len(lines)):
                 if re.search("(CMS-2\s*\$)", lines[j+1]):
-                    fileInfo.update(analyze_direct(lines[i:j], procedure_over_250))
+                    fileInfo.update(analyze_direct(lines[i:j], procedure_over_250, procedure_230_250))
                     i = j + 1  # Update loop counter so we don't analyze code block more than once
                     break
             i = j + 1  # Prevent infinite loop if code sample improperly formatted
@@ -141,8 +142,10 @@ def analyze(lines, name):
             if re.match(HL_start_procedure_pattern, lines[i]):
                 for j in range(i, len(lines)):
                     if re.search(HL_end_procedure_pattern, lines[j + 1]):
-                        if j - i > 250:
-                            procedure_over_250 += 1
+                        if 230 <= j - i <= 250:
+                            procedure_230_250.append(lines[i])
+                        elif j - i > 250:
+                            procedure_over_250.append(lines[i])
                         break
 
             # Checks to see if current line has a Data statement
@@ -211,7 +214,7 @@ def check_file_extension(filename):
 
 
 # Returns OrderedDict of findings
-def analyze_direct(lines, procedure_over_250):
+def analyze_direct(lines, procedure_over_250, procedure_230_250):
     info = OrderedDict()
 
     single_comments_counter = 0
@@ -238,8 +241,10 @@ def analyze_direct(lines, procedure_over_250):
         if re.match(direct_start_procedure_pattern, lines[i]):
             for j in range(i, len(lines)):
                 if re.search(direct_end_procedure_pattern, lines[j+1]):
-                    if j - i > 250:
-                        procedure_over_250 += 1
+                    if 230 <= j - i <= 250:
+                        procedure_230_250.append(lines[i])
+                    elif j - i > 250:
+                        procedure_over_250.append(lines[i])
                     break
 
     info["Executable CMS2 lines"] = executable_counter

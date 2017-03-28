@@ -24,11 +24,15 @@ class CMS2File:
     Total_exec_stmts = 0
     Total_src_lines = 0
 
+    procedure_over_250 = []
+    procedure_230_250 = []
+    timestamp = ''
+
     # Constructor
     def __init__(self, name, type, HL_exec_stmts, HL_exec_lines, HL_data_stmts,
                  HL_data_lines, HL_comment_stmts, HL_comment_lines, HL_noncomment_lines,
                  HL_other_stmts, Direct_exec_stmts, Direct_data_stmts,
-                 Direct_comment_lines, timestamp):
+                 Direct_comment_lines, procedure_over_250, procedure_230_250, timestamp):
         self.name = name
         self.type = type
         self.HL_exec_stmts = HL_exec_stmts
@@ -42,6 +46,8 @@ class CMS2File:
         self.Direct_exec_stmts = Direct_exec_stmts
         self.Direct_data_stmts = Direct_data_stmts
         self.Direct_comment_lines = Direct_comment_lines
+        self.procedure_230_250 = procedure_230_250
+        self.procedure_over_250 = procedure_over_250
         self.timestamp = timestamp
 
         self.Total_exec_stmts = HL_exec_stmts + Direct_exec_stmts
