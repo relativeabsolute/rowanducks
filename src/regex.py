@@ -106,6 +106,7 @@ def analyze(lines, name):
     HL_statement_counter = 0
 
     HL_data_statement_counter = 0
+    procedure_over_250 = 0
 
     # Changed the "for in" loop to while so we can change loop counter when needed (see lines 100, 115)
     i = 0
@@ -119,7 +120,7 @@ def analyze(lines, name):
         if re.search('(DIRECT\s*\$)', lines[i]):
             for j in range(i, len(lines)):
                 if re.search("(CMS-2\s*\$)", lines[j+1]):
-                    fileInfo.update(analyze_direct(lines[i:j]))
+                    fileInfo.update(analyze_direct(lines[i:j], procedure_over_250))
                     i = j + 1  # Update loop counter so we don't analyze code block more than once
                     break
             i = j + 1  # Prevent infinite loop if code sample improperly formatted
@@ -135,6 +136,14 @@ def analyze(lines, name):
                 # Adds note to note_dictionary.
                 comment_text = re.search(note_pattern, lines[i]).group(1)
                 note_dictionary[current_line] = comment_text
+
+            # Checks to see if the current line is the start of a procedure
+            if re.match(HL_start_procedure_pattern, lines[i]):
+                for j in range(i, len(lines)):
+                    if re.search(HL_end_procedure_pattern, lines[j + 1]):
+                        if j - i >= 250:
+                            procedure_over_250 += 1
+                        break
 
             # Checks to see if current line has a Data statement
             if re.search(data_statement_pattern, lines[i]):
@@ -186,7 +195,6 @@ def analyze(lines, name):
     timestamp = str(datetime.datetime.now())
     print(timestamp)
 
-
     # Don't think we need this information anymore
     # fileInfo["Block Comment Dictionary"] = block_comment_counter
     # fileInfo["Note Dictionary"] = note_dictionary
@@ -203,7 +211,7 @@ def check_file_extension(filename):
 
 
 # Returns OrderedDict of findings
-def analyze_direct(lines):
+def analyze_direct(lines, procedure_over_250):
     info = OrderedDict()
 
     single_comments_counter = 0
@@ -225,6 +233,14 @@ def analyze_direct(lines):
             # Adds comment to single_comment_dictionary
             comment_text = re.search(single_comment_pattern, lines[i]).group(1)
             single_comment_dictionary[current_line] = comment_text
+
+        # Checks to see if the current line is the start of a procedure
+        if re.match(direct_start_procedure_pattern, lines[i]):
+            for j in range(i, len(lines)):
+                if re.search(direct_end_procedure_pattern, lines[j+1]):
+                    if j - i >= 250:
+                        procedure_over_250 += 1
+                    break
 
     info["Executable CMS2 lines"] = executable_counter
     info["Single line Direct CMS2 comments"] = single_comments_counter
