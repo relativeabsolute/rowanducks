@@ -28,6 +28,17 @@ single_comment_pattern = '(\. .*)'
 # Accepts any digits followed by any number of white spaces, followed by 'COMMENT', followed by any characters.
 block_comment_pattern = '([0-9]*\sCOMMENT.*)'
 
+# Accepts any characters followed by 'SYS-PROC' followed by any characters and a '$'
+direct_start_procedure_pattern = '(\.*SYS-PROC\s*\$)'
+
+# Accepts any characters followed by 'END-SYS-PROC' followed by any characters and a '$'
+direct_end_procedure_pattern = '(\.*END-SYS-PROC.*\$)'
+
+# Accepts any characters followed by 'PROCEDURE' followed by any characters and a '$'
+HL_start_procedure_pattern = '(\.*PROCEDURE.*\$)'
+
+# Accepts any characters followed by 'RETURN' followed by any characters and a '$'
+HL_end_procedure_pattern = '(\.*RETURN.*\$)'
 
 # The three major types of data statements are switches, variables, and aggregates
 data_statement_pattern = '((.*SET.*TO.*\$)|(.*SWITCH.*\$.*END-SWITCH.*\$)|(.*FIELD\b\S*\b.*\$))'
@@ -42,7 +53,7 @@ def main():
     list_CMS2FileInfo = []
     # Takes arguments (filenames) from command line separated by spaces
     # Could update this to take a directory and analyze all files in directory
-    for n in range (1, len(sys.argv)):
+    for n in range(1, len(sys.argv)):
         if os.path.isfile(sys.argv[n]):
             input_files.append(sys.argv[n])
             #print sys.argv[n]
@@ -91,6 +102,8 @@ def analyze(lines, name):
     HL_statement_counter = 0
 
     HL_data_statement_counter = 0
+    procedure_over_250 = []
+    procedure_230_250 = []
 
 
     # Changed the "for in" loop to while so we can change loop counter when needed (see lines 100, 115)
@@ -105,8 +118,8 @@ def analyze(lines, name):
         if re.search('(DIRECT\s*\$)', lines[i]):
             for j in range(i, len(lines)):
                 if re.search("(CMS-2\s*\$)", lines[j+1]):
-                    fileInfo.update(analyze_direct(lines[i:j]))
-                    i = j+1 # Update loop counter so we don't analyze code block more than once
+                    fileInfo.update(analyze_direct(lines[i:j], procedure_over_250, procedure_230_250))
+                    i = j + 1  # Update loop counter so we don't analyze code block more than once
                     break
             i = j+1 # Prevent infinite loop if code sample improperly formatted
         # This else handles all high-level code.
@@ -122,6 +135,16 @@ def analyze(lines, name):
                 # Adds note to note_dictionary.
                 comment_text = re.search(note_pattern, lines[i]).group(1)
                 note_dictionary[current_line] = comment_text
+
+            # Checks to see if the current line is the start of a procedure
+            if re.match(HL_start_procedure_pattern, lines[i]):
+                for j in range(i, len(lines)):
+                    if re.search(HL_end_procedure_pattern, lines[j + 1]):
+                        if 230 <= j - i <= 250:
+                            procedure_230_250.append(lines[i])
+                        elif j - i > 250:
+                            procedure_over_250.append(lines[i])
+                        break
 
             # Checks to see if current line has a Data statement
             if re.search(data_statement_pattern, lines[i]):
@@ -170,6 +193,9 @@ def analyze(lines, name):
     fileInfo["Lines containing High Level Data Statements"] = HL_data_statement_counter
     fileInfo["Total lines"] = len(lines)
 
+    # TODO Store this in the CMS2File object when implemented
+    timestamp = str(datetime.datetime.now())
+    print(timestamp)
     # Don't think we need this information anymore
     # fileInfo["Block Comment Dictionary"] = block_comment_counter
     # fileInfo["Note Dictionary"] = note_dictionary
@@ -185,7 +211,7 @@ def check_file_extension(filename):
         print("Expected file extension .cts or .cs2, found " + extension + " in " + filename)
 
 # Returns OrderedDict of findings
-def analyze_direct(lines):
+def analyze_direct(lines, procedure_over_250, procedure_230_250):
     info = OrderedDict()
 
     single_comments_counter = 0
@@ -207,6 +233,16 @@ def analyze_direct(lines):
             # Adds comment to single_comment_dictionary
             comment_text = re.search(single_comment_pattern, lines[i]).group(1)
             single_comment_dictionary[current_line] = comment_text
+
+        # Checks to see if the current line is the start of a procedure
+        if re.match(direct_start_procedure_pattern, lines[i]):
+            for j in range(i, len(lines)):
+                if re.search(direct_end_procedure_pattern, lines[j+1]):
+                    if 230 <= j - i <= 250:
+                        procedure_230_250.append(lines[i])
+                    elif j - i > 250:
+                        procedure_over_250.append(lines[i])
+                    break
 
     info["Executable CMS2 lines"] = executable_counter
     info["Single line Direct CMS2 comments"] = single_comments_counter
