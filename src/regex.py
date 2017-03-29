@@ -10,8 +10,6 @@ import re
 import os
 import sys
 from collections import OrderedDict
-import datetime
-
 from CMS2FileInfo import CMS2FileInfo
 
 sample_file = "/SampleDirectory/CMS2YSample.txt"
@@ -58,7 +56,7 @@ def main():
     for n in range(1, len(sys.argv)):
         if os.path.isfile(sys.argv[n]):
             input_files.append(sys.argv[n])
-            # print sys.argv[n]
+            #print sys.argv[n]
         elif os.path.isdir(sys.argv[n]):
             list = getFilesFromDir(sys.argv[n])
             for file in list:
@@ -67,14 +65,12 @@ def main():
     for location in input_files:
         list_CMS2FileInfo.append(split_file(location))
     for fileData in list_CMS2FileInfo:
-        print (fileData.printString())
-
+        print fileData.printString()
 
 # TODO return files in subdirectories
 # TODO only return files with correct extension
 def getFilesFromDir(directory):
     return [os.path.join(directory,fn) for fn in next(os.walk(directory))[2]]
-
 
 # The method splits a CMS-2Y file by newline characters and sends it to analyze().
 # Returns the OrderedDict sent back by analyze().
@@ -109,10 +105,11 @@ def analyze(lines, name):
     procedure_over_250 = []
     procedure_230_250 = []
 
+
     # Changed the "for in" loop to while so we can change loop counter when needed (see lines 100, 115)
     i = 0
     fileInfo = OrderedDict()
-    while i < len(lines):
+    while (i < len(lines)):
         current_line = ""
         comment_text = ""
         statement_text = ""
@@ -124,12 +121,13 @@ def analyze(lines, name):
                     fileInfo.update(analyze_direct(lines[i:j], procedure_over_250, procedure_230_250))
                     i = j + 1  # Update loop counter so we don't analyze code block more than once
                     break
-            i = j + 1  # Prevent infinite loop if code sample improperly formatted
+            i = j+1 # Prevent infinite loop if code sample improperly formatted
         # This else handles all high-level code.
         else:
             if 'GOTO' in lines[i]:
                 # I'm not sure how to handle this yet, but the sample output keeps track of them.
                 goto_counter += 1
+                #print("GOTO detected on line " + str(current_line))
 
             # Checks to see if the current line contains a programmer's note.
             if re.search(note_pattern, lines[i]):
@@ -183,7 +181,8 @@ def analyze(lines, name):
                         i = j
                         break
             # Loop counter
-            i += 1
+            i+=1
+    fileInfo["Number of Lines"] = len(lines)
     fileInfo["Go-To Statements"] = goto_counter
     fileInfo["Notes"] = note_counter
     fileInfo["Block comments"] = block_comment_counter
@@ -197,7 +196,6 @@ def analyze(lines, name):
     # TODO Store this in the CMS2File object when implemented
     timestamp = str(datetime.datetime.now())
     print(timestamp)
-
     # Don't think we need this information anymore
     # fileInfo["Block Comment Dictionary"] = block_comment_counter
     # fileInfo["Note Dictionary"] = note_dictionary
@@ -211,7 +209,6 @@ def check_file_extension(filename):
     else:
         valid_name = False
         print("Expected file extension .cts or .cs2, found " + extension + " in " + filename)
-
 
 # Returns OrderedDict of findings
 def analyze_direct(lines, procedure_over_250, procedure_230_250):
@@ -250,7 +247,6 @@ def analyze_direct(lines, procedure_over_250, procedure_230_250):
     info["Executable CMS2 lines"] = executable_counter
     info["Single line Direct CMS2 comments"] = single_comments_counter
     return info
-
 
 # TODO everything
 def compare_files(original, modified):
