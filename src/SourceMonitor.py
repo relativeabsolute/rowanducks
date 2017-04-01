@@ -12,18 +12,35 @@ class SourceMonitor:
 
         date_title = now.strftime("%d/%b/%Y")
 
-        self.header_string += "\t\t\t\t\t\t\t\t\t\t\t" + date_title
-        self.header_string += "\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tPAGE 1\n"
+        #self.header_string += "\t\t\t\t\t\t\t\t\t\t\t" + date_title
+        #self.header_string += "\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tPAGE 1\n"
+
+        self.header_string = "{0:<{width}}".format('SRCMON - SOURCE CODE MONITOR, VERSION 07.00', width=int(self.columns))
+        self.header_string += "\n{0:>{width}}".format(date_title, width=int(self.columns - self.columns / 6))
+        self.header_string += ("\n{0:>{width}}").format('PAGE 1', width=int(self.columns - self.columns / 6))
 
         class_name = "///CLASS NAME HERE///"
-        self.header_string += "\t\t\t\t\t\t\t" + class_name + "\n"
+        self.header_string += ("\n{0:^{width}}").format(class_name, width=self.columns)
+        self.header_string += "\n"
 
-        column_names = "MODULE\t\t\t\t\t\t|FILE STATUS|\tINITIAL SIZE\t| CPCR\t\t\t"
-        column_names += "ADDITIONS\tMODIFICATIONS\t|\tDELETIONS\n"
-        self.header_string += column_names
+        column_names = "{0:<{width}}".format('MODULE', width=int(self.columns / 4))
+        column_names += "{0:^{width}}".format('|FILE STATUS|', width=int(self.columns / 12))
+    
+        column_names += "{0:^{width}}".format('INITIAL SIZE', width=int(self.columns / 8))
+        column_names += "| {0:<{width}}".format('CPCR', width=int(self.columns / 8))
 
-        underline_str = "----------------------------------------|-------------------|--------------"
-        underline_str += "-----------------------------|----------------"
+        column_names += "{0:<{width}}".format('ADDITIONS', width=int(self.columns / 10))
+        column_names += "{0:<{width}}|".format('MODIFICATIONS', width=int(self.columns / 10))
+        column_names += "{0:>{width}}".format('DELETIONS', width=int(self.columns / 10))
+
+        self.header_string += column_names + "\n"
+
+        underline_str = "{0:{fill}<{width}}".format("", fill="-", width=int(self.columns / 4))
+        underline_str += "|{0:{fill}<{width}}|".format("", fill="-", width=int(self.columns / 12) - 2)
+        underline_str += "{0:{fill}<{width}}".format("", fill="-", width=int(self.columns / 8))
+        underline_str += "|{0:{fill}<{width}}".format("", fill="-", width=int(self.columns / 8 + self.columns / 5 + 1))
+        underline_str += "|{0:{fill}<{width}}".format("", fill="-", width=int(self.columns / 8))
+
         self.header_string += underline_str
 
     def get_rows(self):
@@ -35,6 +52,7 @@ class SourceMonitor:
 
 
     def __init__(self, diffs):
+        self.columns = 160
         self.get_header_string()
         self.diffs = diffs
         self.get_rows()
