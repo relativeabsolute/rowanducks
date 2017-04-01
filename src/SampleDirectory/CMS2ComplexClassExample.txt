@@ -31,3 +31,9 @@
 22			*				MESSAGE TIME TAG		                                           2413000057
 22							MIN:0  MAX:523287.999                                              2413000058
 23			END-TABLE  WTMTSOUT
+
+24          SWITCH INOP $                                                                      2413000059
+25              IN1 $                                                                          2413000060
+26              IN2 $                                                                          2413000061
+27              IN3 $                                                                          2413000062
+28          END-SWITCH INOP $                                                                  2413000063
