@@ -182,11 +182,14 @@ def analyze(lines, name):
                         break
             # Loop counter
             i+=1
+
+    # System Output:
     fileInfo["Number of Lines"] = len(lines)
     fileInfo["Go-To Statements"] = goto_counter
     fileInfo["Notes"] = note_counter
     fileInfo["Block comments"] = block_comment_counter
     fileInfo["Block comment lines"] = block_comment_line_counter
+    fileInfo["Number of non-comments"] = len(lines) - block_comment_line_counter
     fileInfo["High Level CMS2 Single Line Statements"] = HL_statement_counter
     fileInfo["Multi-line High Level CMS2 Statements"] = HL_multi_statement_counter
     fileInfo["Lines of Multi-line High Level CMS2 Statements"] = HL_multi_statement_lines
@@ -194,8 +197,8 @@ def analyze(lines, name):
     fileInfo["Total lines"] = len(lines)
 
     # TODO Store this in the CMS2File object when implemented
-    timestamp = str(datetime.datetime.now())
-    print(timestamp)
+    #timestamp = str(datetime.datetime.now())
+    #print(timestamp)
     # Don't think we need this information anymore
     # fileInfo["Block Comment Dictionary"] = block_comment_counter
     # fileInfo["Note Dictionary"] = note_dictionary
