@@ -99,7 +99,7 @@ class Diff:
 
     # Run diff between local file and same file from latest commit
     def run_diff_on_latest_commit(self):
-        repo = git.Repo('~/sweng/rowanducks/')
+        repo = git.Repo('../../rowanducks/')
         for file in self.input_files:
             # Get raw text of file from latest commit
             unicode = repo.git.show('HEAD:'+'src/'+file)
