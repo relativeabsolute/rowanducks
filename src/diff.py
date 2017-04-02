@@ -111,14 +111,18 @@ class Diff:
 
             self.diff_list.append(self.analyze(file, oldVersionFile, open(file).readlines()))
 
+    def getDataAsString(self, fileInfo):
+        return str(fileInfo.filename), str(fileInfo.additions), str(fileInfo.modifications), str(fileInfo.deletions)
+
     def __str__(self):
         result = ""
         for fileInfo in self.diff_list:
+            name, add, mod, dele = self.getDataAsString(fileInfo)
             result += "File: "
-            result += str(fileInfo.filename) + "\n"
-            result += "Additions: " + str(fileInfo.additions) + "\n"
-            result += "Modifications: " + str(fileInfo.modifications) + "\n"
-            result += "Deletions: " + str(fileInfo.deletions) + "\n" + "\n"
+            result += name + "\n"
+            result += "Additions: " + add + "\n"
+            result += "Modifications: " + mod + "\n"
+            result += "Deletions: " + dele + "\n" + "\n"
         return result
 
 if __name__ == "__main__":

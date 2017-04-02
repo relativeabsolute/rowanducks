@@ -46,27 +46,29 @@ class SourceMonitor:
     def get_rows(self):
         # main string contains the rows of data of the report
         self.main_string = ""
-        for diff in self.diffs:
-            self.main_string += diff.moduleName + ":\n"
-            self.main_string += "\t" + diff.file1 + "\t| CHANGED   |\t\t\t\t\t| UNSPECIFIED\t"
+        for fileInfo in self.diff.diff_list:
+            name, add, mod, dele = self.diff.getDataAsString(fileInfo)
+            self.main_string += name + ": " + "\t\t\t\t\t\t\t\t\t\t\t\t" \
+                                + add + mod + dele + "\n"
+            self.main_string += "\t" + "\t| CHANGED   |\t\t\t\t\t| UNSPECIFIED\t\n"
+        #for diff in self.diffs:
+        #    self.main_string += diff.moduleName + ":\n"
+        #    self.main_string += "\t" + diff.file1 + "\t| CHANGED   |\t\t\t\t\t| UNSPECIFIED\t"
 
 
-    def __init__(self, diffs):
+    def __init__(self, diff):
         self.columns = 160
         self.get_header_string()
-        self.diffs = diffs
+        self.diff = diff
         self.get_rows()
 
 def main():
-    file1 = "CMS-2_HighLevel2.txt"
-    file2 = "CMS-2_HighLevel2_Edited.txt"
+    d1 = Diff()
+    d1.readInput()
+    d1.run_diff_on_latest_commit()
+    # diffs = [d1]
 
-    d1 = Diff(file1, file2)
-    d1.moduleName = "CMS-2_HighLevel"
-
-    diffs = [d1]
-
-    sm = SourceMonitor(diffs)
+    sm = SourceMonitor(d1)
     print(sm.header_string)
     print(sm.main_string)
 
