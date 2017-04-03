@@ -87,3 +87,6 @@ ENV/
 
 # Rope project settings
 .ropeproject
+src/.idea/misc.xml
+*.xml
+src/.idea/src.iml
