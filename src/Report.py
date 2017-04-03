@@ -145,17 +145,17 @@ def main():
     print("\t\t\t\t\t\t\t\t\t\t\tSource Review Summary")
     print("\t\t\t\t\t\t\t\t\t\t\t\tGrand Summary")
     print("\t\t\t\t\t\t\t\t\t\t\t  Full class/Source")
-    print "0CPS-3.1.3 5.1.5 GOTO statement found \t\t\t\t\t\t\t\t\t ", occurrences[0], "occurrence(s) in ", modules_detected[0], " module(s) detected"
-    print "0CPS-3.1.3 5.1.1 SYSTEM not structured \t\t\t\t\t\t\t\t\t ", occurrences[1], "occurrence(s) in ", modules_detected[1], " module(s) detected"
-    print "0CPS-3.1.3 5.1.3 Misplaced END-SYSTEM \t\t\t\t\t\t\t\t\t ", occurrences[2], "occurrence(s) in ", modules_detected[2], " module(s) detected"
-    print "0CPS-3.1.3 5.1.3 Incorrect file extension \t\t\t\t\t\t\t\t ", occurrences[3], "occurrence(s) in ", modules_detected[3], " module(s) detected"
-    print "0CPS-3.1.3 5.1.3 Multiple components in file \t\t\t\t\t\t\t ", occurrences[4], "occurrence(s) in ", modules_detected[4], " module(s) detected"
-    print "0CPS-3.1.3 5.1.3 Component name/file name mismatch \t\t\t\t\t\t ", occurrences[5], "occurrence(s) in ", modules_detected[5], " module(s) detected"
-    print "0CPS-3.1.3 5.1.2 System code letter mismatch \t\t\t\t\t\t\t ", occurrences[6], "occurrence(s) in ", modules_detected[6], " module(s) detected"
+    print ("0CPS-3.1.3 5.1.5 GOTO statement found \t\t\t\t\t\t\t\t\t ", occurrences[0], "occurrence(s) in ", modules_detected[0], " module(s) detected")
+    print ("0CPS-3.1.3 5.1.1 SYSTEM not structured \t\t\t\t\t\t\t\t\t ", occurrences[1], "occurrence(s) in ", modules_detected[1], " module(s) detected")
+    print ("0CPS-3.1.3 5.1.3 Misplaced END-SYSTEM \t\t\t\t\t\t\t\t\t ", occurrences[2], "occurrence(s) in ", modules_detected[2], " module(s) detected")
+    print ("0CPS-3.1.3 5.1.3 Incorrect file extension \t\t\t\t\t\t\t\t ", occurrences[3], "occurrence(s) in ", modules_detected[3], " module(s) detected")
+    print ("0CPS-3.1.3 5.1.3 Multiple components in file \t\t\t\t\t\t\t ", occurrences[4], "occurrence(s) in ", modules_detected[4], " module(s) detected")
+    print ("0CPS-3.1.3 5.1.3 Component name/file name mismatch \t\t\t\t\t\t ", occurrences[5], "occurrence(s) in ", modules_detected[5], " module(s) detected")
+    print ("0CPS-3.1.3 5.1.2 System code letter mismatch \t\t\t\t\t\t\t ", occurrences[6], "occurrence(s) in ", modules_detected[6], " module(s) detected")
     print("\t\t\t\t MDBA4E1 \t MTD4E1")
-    print "0CPS-3.1.3 5.1.2 Module mnemonic mismatch \t\t\t\t\t\t\t\t ", occurrences[7], "occurrence(s) in ", modules_detected[7], " module(s) detected"
-    print "0CPS-3.1.3 5.1.2 Non-standard prime procedure name \t\t\t\t\t\t ", occurrences[8], "occurrence(s) in ", modules_detected[8], " module(s) detected"
-    print "0CPS-3.1.3 5.1.1 Component abstract not found \t\t\t\t\t\t\t ", occurrences[9], "occurrence(s) in ", modules_detected[9], " module(s) detected"
+    print ("0CPS-3.1.3 5.1.2 Module mnemonic mismatch \t\t\t\t\t\t\t\t ", occurrences[7], "occurrence(s) in ", modules_detected[7], " module(s) detected")
+    print ("0CPS-3.1.3 5.1.2 Non-standard prime procedure name \t\t\t\t\t\t ", occurrences[8], "occurrence(s) in ", modules_detected[8], " module(s) detected")
+    print ("0CPS-3.1.3 5.1.1 Component abstract not found \t\t\t\t\t\t\t ", occurrences[9], "occurrence(s) in ", modules_detected[9], " module(s) detected")
 
     # TODO: convert to human readable time format
     print("\nBefore time = " + str(time.ctime(beforeTime)))
