@@ -11,6 +11,7 @@ import os
 import sys
 from collections import OrderedDict
 from CMS2FileInfo import CMS2FileInfo
+from CMS2File import CMS2File
 
 sample_file = "/SampleDirectory/CMS2YSample.txt"
 sample_HL_file = "/SampleDirectory/CMS-2_HighLevel_2.txt"
@@ -50,7 +51,7 @@ note_pattern = '(\'\'[\w|\s|-]*\'\')'
 def main():
     finished = False
     input_files = []
-    list_CMS2FileInfo = []
+    list_CMS2File = []
     # Takes arguments (filenames) from command line separated by spaces
     # Could update this to take a directory and analyze all files in directory
     for n in range(1, len(sys.argv)):
@@ -63,8 +64,8 @@ def main():
                 input_files.append(file)
 
     for location in input_files:
-        list_CMS2FileInfo.append(split_file(location))
-    for fileData in list_CMS2FileInfo:
+        list_CMS2File.append(split_file(location))
+    for fileData in list_CMS2File:
         print fileData.printString()
 
 # TODO return files in subdirectories
@@ -202,7 +203,7 @@ def analyze(lines, name):
     # Don't think we need this information anymore
     # fileInfo["Block Comment Dictionary"] = block_comment_counter
     # fileInfo["Note Dictionary"] = note_dictionary
-    return CMS2FileInfo(name, fileInfo)
+    return CMS2File(name, fileInfo)
 
 
 def check_file_extension(filename):

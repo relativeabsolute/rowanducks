@@ -21,6 +21,12 @@ class CMS2File:
     Direct_data_stmts = 0
     Direct_comment_lines = 0
 
+    GoTo_stmts = 0
+    notes = 0
+    block_comments = 0
+    block_comment_lines = 0
+
+
     Total_exec_stmts = 0
     Total_src_lines = 0
 
@@ -52,6 +58,21 @@ class CMS2File:
 
         self.Total_exec_stmts = HL_exec_stmts + Direct_exec_stmts
         self.Total_src_lines = HL_exec_lines + HL_data_lines + HL_comment_lines + HL_noncomment_lines + Direct_comment_lines
+
+    def __init__(self, name, fileInfo):
+        self.name = name
+        self.Total_src_lines = fileInfo["Number of Lines"]
+        self.GoTo_stmts = fileInfo["Go-To Statements"]
+        self.notes = fileInfo["Notes"]
+        self.block_comments = fileInfo["Block comments"]
+        self.block_comment_lines = fileInfo["Block comment lines"]
+        self.HL_noncomment_lines = fileInfo["Number of non-comments"]
+        self.HL_exec_stmts = fileInfo["High Level CMS2 Single Line Statements"] = fileInfo["Multi-line High Level CMS2 Statements"]
+        self.HL_exec_lines = fileInfo["Lines of Multi-line High Level CMS2 Statements"]
+        self.HL_data_stmts = fileInfo["Lines containing High Level Data Statements"]
+
+
+
 
     def recalculateTotals(self):
         CMS2File.Total_src_lines = self.HL_exec_lines + self.HL_data_lines + self.HL_comment_lines + self.HL_noncomment_lines + self.Direct_comment_lines
