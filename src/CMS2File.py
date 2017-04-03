@@ -200,6 +200,18 @@ class CMS2File:
         #self.Total_src_lines = self.HL_exec_lines + self.HL_data_lines + self.HL_comment_lines + self.HL_noncomment_lines + self.Direct_comment_lines
         # recalculateTotals()
 
+    def printString(self):
+        string = "Number of Lines: " + str(self.Total_src_lines) + "\n"
+        string += "Go-To Statements: " + str(self.GoTo_stmts) + "\n"
+        string += "Notes: " + str(self.notes) + "\n"
+        string += "Block comments: " + str(self.block_comments) + "\n"
+        string += "Block comment lines: " + str(self.block_comment_lines) + "\n"
+        string += "Number of non-comments: " + str(self.HL_noncomment_lines) + "\n"
+        string += "High Level CMS2 Single Line Statements: " + str(self.HL_exec_stmts) + "\n"
+        string += "Multi-line High Level CMS2 Statements: " + str(self.HL_exec_lines) + "\n"
+        string += "Lines containing High Level Data Statements: " + str(self.HL_data_stmts) + "\n"
+        return string
+
     #TODO: Optimize recalculation of src/exec lines by writing a method and calling it when necessary.
 
     # ------------------TOTAL--------------------
