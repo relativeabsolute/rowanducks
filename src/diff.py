@@ -102,9 +102,8 @@ class Diff:
         repo = git.Repo('../../rowanducks/')
         for file in self.input_files:
             # Get raw text of file from latest commit
-            unicode = repo.git.show('HEAD:'+'src/'+file)
-            # Split by line into arry
-            oldVersionFile = unicode.encode('utf-8').strip().split('\n')
+            # Split by line into array
+            oldVersionFile = repo.git.show('HEAD:'+'src/'+file).split('\n')
             # Add delimiter back in for comparison purposes
             for line in range(0, len(oldVersionFile)):
                 oldVersionFile[line]+='\n'
