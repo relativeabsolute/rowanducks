@@ -21,10 +21,14 @@ class Diff:
         self.input_files = []
         self.CPCR = []
 
-    # TODO return files in subdirectories
-    # TODO only return files with correct extension
     def getFilesFromDir(self, directory):
-        return [os.path.join(directory, fn) for fn in next(os.walk(directory))[2]]
+        file_paths = []  # List which will store all of the full filepaths.
+
+        for root, directories, files in os.walk(directory):
+            for filename in files:
+                filepath = os.path.join(root, filename)
+                file_paths.append(filepath)  # Add it to the list.
+        return file_paths
 
     # Reads sys arguments to get files to run diff on
     def readInput(self):
