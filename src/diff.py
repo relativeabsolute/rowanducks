@@ -95,7 +95,13 @@ class Diff:
         additions["Comments"] -= modifications["Comments"]
         deletions["Comments"] -= modifications["Comments"]
 
-        return CMS2FileDiff(filename, additions, modifications, deletions)
+        file_status = "UNCHANGED"
+        if(additions["Comments"] + additions["Instructions"] +
+           modifications["Comments"] + modifications["Instructions"] +
+           deletions["Comments"] + deletions["Instructions"] > 0):
+            file_status = "CHANGED"
+
+        return CMS2FileDiff(filename, file_status, additions, modifications, deletions)
 
     # Run diff between local file and same file from latest commit
     def run_diff_on_latest_commit(self):
@@ -103,22 +109,32 @@ class Diff:
         for file in self.input_files:
             # Get raw text of file from latest commit
             # Split by line into array
-            oldVersionFile = repo.git.show('HEAD:'+'src/'+file).split('\n')
-            # Add delimiter back in for comparison purposes
-            for line in range(0, len(oldVersionFile)):
-                oldVersionFile[line]+='\n'
-
-            self.diff_list.append(self.analyze(file, oldVersionFile, open(file).readlines()))
+            try:
+                oldVersionFile = repo.git.show('HEAD:'+'src/'+file).split('\n')
+                # Add delimiter back in for comparison purposes
+                for line in range(0, len(oldVersionFile)):
+                    oldVersionFile[line]+='\n'
+                self.diff_list.append(self.analyze(file, oldVersionFile, open(file).readlines()))
+            except:
+                # File not in repo (new file)
+                modifications = {"Instructions": 0, "Comments": 0}
+                deletions = {"Instructions": 0, "Comments": 0}
+                additions = {"Instructions": 0, "Comments": 0}
+                # TODO: Use regex analyze method to get # instructions and comments
+                self.diff_list.append(CMS2FileDiff(file, "ADDED", additions, modifications, deletions))
 
     def getDataAsString(self, fileInfo):
-        return str(fileInfo.filename), str(fileInfo.additions), str(fileInfo.modifications), str(fileInfo.deletions)
+        return str(fileInfo.filename), str(fileInfo.status), str(fileInfo.CPCR), \
+               str(fileInfo.additions), str(fileInfo.modifications), str(fileInfo.deletions)
 
     def __str__(self):
         result = ""
         for fileInfo in self.diff_list:
-            name, add, mod, dele = self.getDataAsString(fileInfo)
+            name, status, cpcr, add, mod, dele = self.getDataAsString(fileInfo)
             result += "File: "
             result += name + "\n"
+            result += "Status: " + status + "\n"
+            result += "CPCR: " + cpcr + "\n"
             result += "Additions: " + add + "\n"
             result += "Modifications: " + mod + "\n"
             result += "Deletions: " + dele + "\n" + "\n"
