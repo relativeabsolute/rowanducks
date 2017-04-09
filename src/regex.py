@@ -58,7 +58,7 @@ def main():
             input_files.append(sys.argv[n])
             #print sys.argv[n]
         elif os.path.isdir(sys.argv[n]):
-            list = getFilesFromDir(sys.argv[n])
+            list = get_files_from_dir(sys.argv[n])
             for file in list:
                 input_files.append(file)
 
@@ -67,10 +67,15 @@ def main():
     for fileData in list_CMS2File:
         print (fileData.printString())
 
-# TODO return files in subdirectories
-# TODO only return files with correct extension
-def getFilesFromDir(directory):
-    return [os.path.join(directory,fn) for fn in next(os.walk(directory))[2]]
+
+def get_files_from_dir(directory):
+    file_paths = []  # List which will store all of the full filepaths.
+
+    for root, directories, files in os.walk(directory):
+        for filename in files:
+            filepath = os.path.join(root, filename)
+            file_paths.append(filepath)  # Add it to the list.
+    return file_paths
 
 # The method splits a CMS-2Y file by newline characters and sends it to analyze().
 # Returns the OrderedDict sent back by analyze().
