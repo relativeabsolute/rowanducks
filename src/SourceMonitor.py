@@ -1,5 +1,6 @@
 # Author: Johan Burke
 
+import os.path
 from datetime import datetime
 from diff import Diff
 
@@ -48,9 +49,20 @@ class SourceMonitor:
         self.main_string = ""
         for fileInfo in self.diff.diff_list:
             name, add, mod, dele = self.diff.getDataAsString(fileInfo)
-            self.main_string += name + ": " + "\t\t\t\t\t\t\t\t\t\t\t\t" \
-                                + add + mod + dele + "\n"
-            self.main_string += "\t" + "\t| CHANGED   |\t\t\t\t\t| UNSPECIFIED\t\n"
+            name = os.path.split(name)[1]
+            #self.main_string += name + ": " + add + mod + dele 
+            self.main_string += "{0:<{width}}".format(name, width=int(self.columns / 4))
+            self.main_string += "|{0:^{width}}|".format("CHANGED", width=int(self.columns / 12) - 2)
+            self.main_string += "{0:{fill}<{width}}".format("", fill = " ", width = int(self.columns / 8))
+            self.main_string += "|{0:^{width}}".format(" UNSPECIFIED", width = int(self.columns / 8))
+            self.main_string += "{0:<{width}}".format(str(fileInfo.additions["Instructions"])+ "I", width = int(self.columns / 20))
+            self.main_string += "{0:<{width}}".format(str(fileInfo.additions["Comments"]) + "C", width = int(self.columns / 20))
+            self.main_string += "{0:<{width}}".format(str(fileInfo.modifications["Instructions"]) + "I", width = int(self.columns / 20))
+            self.main_string += "{0:<{width}}".format(str(fileInfo.modifications["Comments"]) + "C", width = int(self.columns / 20))
+            self.main_string += " |{0:>{width}}".format(str(fileInfo.deletions["Instructions"]) + "I", width = int(self.columns / 20))
+            self.main_string += "{0:>{width}}".format(str(fileInfo.deletions["Comments"]) + "C", width = int(self.columns / 20))
+            #self.main_string += "\t" + "\t| CHANGED   |\t\t\t\t\t| UNSPECIFIED\t\n"
+            self.main_string += "\n"
         #for diff in self.diffs:
         #    self.main_string += diff.moduleName + ":\n"
         #    self.main_string += "\t" + diff.file1 + "\t| CHANGED   |\t\t\t\t\t| UNSPECIFIED\t"
@@ -67,6 +79,9 @@ def main():
     d1.readInput()
     d1.run_diff_on_latest_commit()
     # diffs = [d1]
+
+    print("Diff output: ")
+    print(str(d1))
 
     sm = SourceMonitor(d1)
     print(sm.header_string)

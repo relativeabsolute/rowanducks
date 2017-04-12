@@ -104,7 +104,7 @@ class Diff:
             # Get raw text of file from latest commit
             unicode = repo.git.show('HEAD:'+'src/'+file)
             # Split by line into arry
-            oldVersionFile = unicode.encode('utf-8').strip().split('\n')
+            oldVersionFile = unicode.strip().split('\n')
             # Add delimiter back in for comparison purposes
             for line in range(0, len(oldVersionFile)):
                 oldVersionFile[line]+='\n'
