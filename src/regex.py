@@ -46,6 +46,12 @@ data_statement_pattern = '((.*SET.*TO.*\$)|(.*SWITCH.*\$.*END-SWITCH.*\$)|(.*FIE
 # Accepts two single apostrophes (''), followed by any characters/digits, followed by two single apostrophes.
 note_pattern = '(\'\'[\w|\s|-]*\'\')'
 
+# Accepts any white space, followed by any capital or lower case letters, more white space, and then SYS-PROC $.
+direct_function_name_pattern = '(\s*[a-zA-Z]*\s*SYS-PROC\s*\$)'
+
+# Accepts PROCEDURE followed by capital or lower case letters, then white space and '$'.
+hl_function_name_pattern = '(PROCEDURE\s*[a-zA-Z]*\s\$)'
+
 
 def main():
     finished = False
@@ -143,11 +149,14 @@ def analyze(lines, name):
             # Checks to see if the current line is the start of a procedure
             if re.match(hl_start_procedure_pattern, lines[i]):
                 for j in range(i, len(lines)):
+                    name = re.search(hl_function_name_pattern, lines[i]).group(1)
+                    name.replace("PROCEDURE", "")
+                    name.replace("$", "")
                     if re.search(HL_end_procedure_pattern, lines[j + 1]):
                         if 230 <= j - i <= 250:
-                            procedure_230_250.append(lines[i])
+                            procedure_230_250.append(name)
                         elif j - i > 250:
-                            procedure_over_250.append(lines[i])
+                            procedure_over_250.append(name)
                         break
 
             # Checks to see if current line has a Data statement
@@ -227,7 +236,11 @@ def analyze_direct(lines, procedure_over_250, procedure_230_250):
     executable_counter = 0
 
     for i in range(len(lines)):
-        current_line = re.match(exec_pattern, lines[i]).group(1)
+        # current_line = re.match(exec_pattern, lines[i]).group(1)
+        # Not sure why this line is here. If I remember, may change.
+        # For now, commented it out because not every line will be executable.
+        # This caused an error.
+        current_line = ""
 
         # Checks to see if the current line is executable code.
         if re.match(exec_pattern, lines[i]):
@@ -246,10 +259,13 @@ def analyze_direct(lines, procedure_over_250, procedure_230_250):
         if re.match(direct_start_procedure_pattern, lines[i]):
             for j in range(i, len(lines)):
                 if re.search(direct_end_procedure_pattern, lines[j+1]):
+                    name = re.search(direct_function_name_pattern, lines[i]).group(1)
+                    name.replace("SYS-PROC", "")
+                    name.replace("$", "")
                     if 230 <= j - i <= 250:
-                        procedure_230_250.append(lines[i])
+                        procedure_230_250.append(name)
                     elif j - i > 250:
-                        procedure_over_250.append(lines[i])
+                        procedure_over_250.append(name)
                     break
 
     info["Executable CMS2 lines"] = executable_counter
