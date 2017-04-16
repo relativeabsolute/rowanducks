@@ -66,6 +66,8 @@ def main():
         list_CMS2File.append(split_file(location))
     for fileData in list_CMS2File:
         print (fileData.printString())
+    return list_CMS2File
+
 
 
 def get_files_from_dir(directory):
@@ -106,6 +108,8 @@ def analyze(lines, name):
     HL_multi_statement_lines = 0
     HL_statement_counter = 0
 
+    HL_executable_counter = 0
+
     HL_data_statement_counter = 0
     procedure_over_250 = []
     procedure_230_250 = []
@@ -140,6 +144,10 @@ def analyze(lines, name):
                 # Adds note to note_dictionary.
                 comment_text = re.search(note_pattern, lines[i]).group(1)
                 note_dictionary[current_line] = comment_text
+
+            # Checks to see if the current line contains an executable statement
+            if re.search(exec_pattern, lines[i]):
+                HL_executable_counter += 1
 
             # Checks to see if the current line is the start of a procedure
             if re.match(HL_start_procedure_pattern, lines[i]):
@@ -199,7 +207,19 @@ def analyze(lines, name):
     fileInfo["Multi-line High Level CMS2 Statements"] = HL_multi_statement_counter
     fileInfo["Lines of Multi-line High Level CMS2 Statements"] = HL_multi_statement_lines
     fileInfo["Lines containing High Level Data Statements"] = HL_data_statement_counter
+    fileInfo["HL Executable Statements"] = HL_executable_counter
     fileInfo["Total lines"] = len(lines)
+
+    if fileInfo.__contains__("Direct Executable CMS2 Statements"):
+        print "" #do nothing
+    else:
+        fileInfo["Direct Executable CMS2 Statements"] = 0
+
+    if fileInfo.__contains__("Single line Direct CMS2 comments"):
+        print "" #do nothing
+    else:
+        fileInfo["Single line Direct CMS2 comments"] = 0
+
 
     # TODO Store this in the CMS2File object when implemented
     #timestamp = str(datetime.datetime.now())
@@ -252,7 +272,7 @@ def analyze_direct(lines, procedure_over_250, procedure_230_250):
                         procedure_over_250.append(lines[i])
                     break
 
-    info["Executable CMS2 lines"] = executable_counter
+    info["Direct Executable CMS2 Statements"] = executable_counter
     info["Single line Direct CMS2 comments"] = single_comments_counter
     return info
 

@@ -10,9 +10,10 @@ class CMS2File:
     name = ""
     type = ""
     HL_exec_stmts = 0
-    HL_exec_lines = 0
     HL_data_stmts = 0
     HL_data_lines = 0
+    HL_single_line_stmt_counter = 0
+    HL_multi_line_stmt_counter = 0
     HL_comment_stmts = 0
     HL_comment_lines = 0
     HL_noncomment_lines = 0
@@ -67,9 +68,12 @@ class CMS2File:
         self.block_comments = fileInfo["Block comments"]
         self.block_comment_lines = fileInfo["Block comment lines"]
         self.HL_noncomment_lines = fileInfo["Number of non-comments"]
-        self.HL_exec_stmts = fileInfo["High Level CMS2 Single Line Statements"] = fileInfo["Multi-line High Level CMS2 Statements"]
-        self.HL_exec_lines = fileInfo["Lines of Multi-line High Level CMS2 Statements"]
+        self.HL_exec_stmts = fileInfo["HL Executable Statements"]
+        self.Direct_exec_stmts = fileInfo["Direct Executable CMS2 Statements"]
         self.HL_data_stmts = fileInfo["Lines containing High Level Data Statements"]
+        self.HL_single_line_stmt_counter = fileInfo["High Level CMS2 Single Line Statements"]
+        self.HL_multi_line_stmt_counter = fileInfo["Multi-line High Level CMS2 Statements"]
+        self.Total_exec_stmts = self.HL_exec_stmts + self.Direct_exec_stmts
 
 
 
@@ -207,9 +211,12 @@ class CMS2File:
         string += "Block comments: " + str(self.block_comments) + "\n"
         string += "Block comment lines: " + str(self.block_comment_lines) + "\n"
         string += "Number of non-comments: " + str(self.HL_noncomment_lines) + "\n"
-        string += "High Level CMS2 Single Line Statements: " + str(self.HL_exec_stmts) + "\n"
-        string += "Multi-line High Level CMS2 Statements: " + str(self.HL_exec_lines) + "\n"
+        string += "High Level CMS2 Single Line Statements: " + str(self.HL_single_line_stmt_counter) + "\n"
+        string += "Multi-line High Level CMS2 Statements: " + str(self.HL_multi_line_stmt_counter) + "\n"
         string += "Lines containing High Level Data Statements: " + str(self.HL_data_stmts) + "\n"
+        string += "High Level Executable Statements: " + str(self.HL_exec_stmts) + "\n"
+        string += "Direct Executable Statements: " + str(self.Direct_exec_stmts) + "\n"
+        string += "Total Executable Statements: " + str(self.Total_exec_stmts) + "\n"
         return string
 
     #TODO: Optimize recalculation of src/exec lines by writing a method and calling it when necessary.
