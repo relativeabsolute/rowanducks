@@ -20,7 +20,7 @@ valid_name = False
 exec_pattern = '(X[0-9]+|A/[0-9]+)'
 
 # Accepts anything that ends in $
-HL_statement_pattern ='(.*\$)'
+hl_statement_pattern = '(.*\$)'
 
 # Accepts a '.' followed by any number of any characters until line ends to extract in-line comment.
 single_comment_pattern = '(\. .*)'
@@ -35,10 +35,10 @@ direct_start_procedure_pattern = '(\.*SYS-PROC\s*\$)'
 direct_end_procedure_pattern = '(\.*END-SYS-PROC.*\$)'
 
 # Accepts any characters followed by 'PROCEDURE' followed by any characters and a '$'
-HL_start_procedure_pattern = '(\.*PROCEDURE.*\$)'
+hl_start_procedure_pattern = '(\.*PROCEDURE.*\$)'
 
 # Accepts any characters followed by 'RETURN' followed by any characters and a '$'
-HL_end_procedure_pattern = '(\.*RETURN.*\$)'
+hl_end_procedure_pattern = '(\.*RETURN.*\$)'
 
 # The three major types of data statements are switches, variables, and aggregates
 data_statement_pattern = '((.*SET.*TO.*\$)|(.*SWITCH.*\$.*END-SWITCH.*\$)|(.*FIELD\b\S*\b.*\$))'
@@ -46,38 +46,43 @@ data_statement_pattern = '((.*SET.*TO.*\$)|(.*SWITCH.*\$.*END-SWITCH.*\$)|(.*FIE
 # Accepts two single apostrophes (''), followed by any characters/digits, followed by two single apostrophes.
 note_pattern = '(\'\'[\w|\s|-]*\'\')'
 
+# Accepts any white space, followed by any capital or lower case letters, more white space, and then SYS-PROC $.
+direct_function_name_pattern = '(\s*[a-zA-Z]*\s*SYS-PROC\s*\$)'
+
+# Accepts PROCEDURE followed by capital or lower case letters, then white space and '$'.
+hl_function_name_pattern = '(PROCEDURE\s*[a-zA-Z]*\s\$)'
+
 
 def main():
     finished = False
     input_files = []
-    list_CMS2File = []
+    list_cms2file = []
     # Takes arguments (filenames) from command line separated by spaces
     # Could update this to take a directory and analyze all files in directory
     for n in range(1, len(sys.argv)):
         if os.path.isfile(sys.argv[n]):
             input_files.append(sys.argv[n])
-            #print sys.argv[n]
         elif os.path.isdir(sys.argv[n]):
             list = get_files_from_dir(sys.argv[n])
             for file in list:
                 input_files.append(file)
 
     for location in input_files:
-        list_CMS2File.append(split_file(location))
-    for fileData in list_CMS2File:
-        print (fileData.printString())
-    return list_CMS2File
-
+        list_cms2file.append(split_file(location))
+    for file_data in list_cms2file:
+        print (file_data.print_string())
+    return list_cms2file
 
 
 def get_files_from_dir(directory):
-    file_paths = []  # List which will store all of the full filepaths.
+    file_paths = []  # List which will store all of the full file paths.
 
     for root, directories, files in os.walk(directory):
         for filename in files:
             filepath = os.path.join(root, filename)
             file_paths.append(filepath)  # Add it to the list.
     return file_paths
+
 
 # The method splits a CMS-2Y file by newline characters and sends it to analyze().
 # Returns the OrderedDict sent back by analyze().
@@ -104,21 +109,21 @@ def analyze(lines, name):
     note_counter = 0
     note_dictionary = {}
 
-    HL_multi_statement_counter = 0
-    HL_multi_statement_lines = 0
-    HL_statement_counter = 0
+    hl_multi_statement_counter = 0
+    hl_multi_statement_lines = 0
+    hl_statement_counter = 0
 
-    HL_executable_counter = 0
+    hl_executable_counter = 0
 
-    HL_data_statement_counter = 0
+
+    hl_data_statement_counter = 0
     procedure_over_250 = []
     procedure_230_250 = []
 
-
     # Changed the "for in" loop to while so we can change loop counter when needed (see lines 100, 115)
     i = 0
-    fileInfo = OrderedDict()
-    while (i < len(lines)):
+    file_info = OrderedDict()
+    while i < len(lines):
         current_line = ""
         comment_text = ""
         statement_text = ""
@@ -127,16 +132,16 @@ def analyze(lines, name):
         if re.search('(DIRECT\s*\$)', lines[i]):
             for j in range(i, len(lines)):
                 if re.search("(CMS-2\s*\$)", lines[j+1]):
-                    fileInfo.update(analyze_direct(lines[i:j], procedure_over_250, procedure_230_250))
+                    file_info.update(analyze_direct(lines[i:j], procedure_over_250, procedure_230_250))
                     i = j + 1  # Update loop counter so we don't analyze code block more than once
                     break
-            i = j+1 # Prevent infinite loop if code sample improperly formatted
+            i = j + 1  # Prevent infinite loop if code sample improperly formatted
         # This else handles all high-level code.
         else:
             if 'GOTO' in lines[i]:
                 # I'm not sure how to handle this yet, but the sample output keeps track of them.
                 goto_counter += 1
-                #print("GOTO detected on line " + str(current_line))
+                # print("GOTO detected on line " + str(current_line))
 
             # Checks to see if the current line contains a programmer's note.
             if re.search(note_pattern, lines[i]):
@@ -147,21 +152,24 @@ def analyze(lines, name):
 
             # Checks to see if the current line contains an executable statement
             if re.search(exec_pattern, lines[i]):
-                HL_executable_counter += 1
+                hl_executable_counter += 1
 
             # Checks to see if the current line is the start of a procedure
-            if re.match(HL_start_procedure_pattern, lines[i]):
+            if re.match(hl_start_procedure_pattern, lines[i]):
                 for j in range(i, len(lines)):
-                    if re.search(HL_end_procedure_pattern, lines[j + 1]):
+                    name = re.search(hl_function_name_pattern, lines[i]).group(1)
+                    name.replace("PROCEDURE", "")
+                    name.replace("$", "")
+                    if re.search(hl_end_procedure_pattern, lines[j + 1]):
                         if 230 <= j - i <= 250:
-                            procedure_230_250.append(lines[i])
+                            procedure_230_250.append(name)
                         elif j - i > 250:
-                            procedure_over_250.append(lines[i])
+                            procedure_over_250.append(name)
                         break
 
             # Checks to see if current line has a Data statement
             if re.search(data_statement_pattern, lines[i]):
-                HL_data_statement_counter += 1
+                hl_data_statement_counter += 1
 
             # Checks first to see if a block comment is present. If not, checks for single line comments.
             # Using re.IGNORECASE because some comments are in lowercase in the sample
@@ -180,54 +188,54 @@ def analyze(lines, name):
                         break
 
             # Check if it's a single liner
-            elif re.search(HL_statement_pattern, lines[i]):
-                HL_statement_counter += 1
+            elif re.search(hl_statement_pattern, lines[i]):
+                hl_statement_counter += 1
             # If statement is not a note or comment or single liner it should be a multi line statement
             # Regex just to make sure the line has some information
             elif re.search('(.*\s[0-9]+)', lines[i]):
                 # Not sure what information we want to record about these multi line statements
-                HL_multi_statement_counter += 1
+                hl_multi_statement_counter += 1
                 for j in range(i, len(lines)):
-                    HL_multi_statement_lines += 1
+                    hl_multi_statement_lines += 1
                     if "$" in lines[j]:
                         # Update counter to prevent double counting
                         i = j
                         break
             # Loop counter
-            i+=1
+            i += 1
 
     # System Output:
-    fileInfo["Number of Lines"] = len(lines)
-    fileInfo["Go-To Statements"] = goto_counter
-    fileInfo["Notes"] = note_counter
-    fileInfo["Block comments"] = block_comment_counter
-    fileInfo["Block comment lines"] = block_comment_line_counter
-    fileInfo["Number of non-comments"] = len(lines) - block_comment_line_counter
-    fileInfo["High Level CMS2 Single Line Statements"] = HL_statement_counter
-    fileInfo["Multi-line High Level CMS2 Statements"] = HL_multi_statement_counter
-    fileInfo["Lines of Multi-line High Level CMS2 Statements"] = HL_multi_statement_lines
-    fileInfo["Lines containing High Level Data Statements"] = HL_data_statement_counter
-    fileInfo["HL Executable Statements"] = HL_executable_counter
-    fileInfo["Total lines"] = len(lines)
+    file_info["Number of Lines"] = len(lines)
+    file_info["Go-To Statements"] = goto_counter
+    file_info["Notes"] = note_counter
+    file_info["Block comments"] = block_comment_counter
+    file_info["Block comment lines"] = block_comment_line_counter
+    file_info["Number of non-comments"] = len(lines) - block_comment_line_counter
+    file_info["High Level CMS2 Single Line Statements"] = hl_statement_counter
+    file_info["Multi-line High Level CMS2 Statements"] = hl_multi_statement_counter
+    file_info["Lines of Multi-line High Level CMS2 Statements"] = hl_multi_statement_lines
+    file_info["Lines containing High Level Data Statements"] = hl_data_statement_counter
+    file_info["HL Executable Statements"] = hl_executable_counter
+    file_info["Total lines"] = len(lines)
 
-    if fileInfo.__contains__("Direct Executable CMS2 Statements"):
+    if file_info.__contains__("Direct Executable CMS2 Statements"):
         print "" #do nothing
     else:
-        fileInfo["Direct Executable CMS2 Statements"] = 0
+        file_info["Direct Executable CMS2 Statements"] = 0
 
-    if fileInfo.__contains__("Single line Direct CMS2 comments"):
+    if file_info.__contains__("Single line Direct CMS2 comments"):
         print "" #do nothing
     else:
-        fileInfo["Single line Direct CMS2 comments"] = 0
+        file_info["Single line Direct CMS2 comments"] = 0
 
 
     # TODO Store this in the CMS2File object when implemented
-    #timestamp = str(datetime.datetime.now())
-    #print(timestamp)
+    # timestamp = str(datetime.datetime.now())
+    # print(timestamp)
     # Don't think we need this information anymore
     # fileInfo["Block Comment Dictionary"] = block_comment_counter
     # fileInfo["Note Dictionary"] = note_dictionary
-    return CMS2File(name, fileInfo)
+    return CMS2File(name, file_info)
 
 
 def check_file_extension(filename):
@@ -238,6 +246,7 @@ def check_file_extension(filename):
         valid_name = False
         print("Expected file extension .cts or .cs2, found " + extension + " in " + filename)
 
+
 # Returns OrderedDict of findings
 def analyze_direct(lines, procedure_over_250, procedure_230_250):
     info = OrderedDict()
@@ -247,7 +256,11 @@ def analyze_direct(lines, procedure_over_250, procedure_230_250):
     executable_counter = 0
 
     for i in range(len(lines)):
-        current_line = re.match(exec_pattern, lines[i]).group(1)
+        # current_line = re.match(exec_pattern, lines[i]).group(1)
+        # Not sure why this line is here. If I remember, may change.
+        # For now, commented it out because not every line will be executable.
+        # This caused an error.
+        current_line = ""
 
         # Checks to see if the current line is executable code.
         if re.match(exec_pattern, lines[i]):
@@ -266,19 +279,18 @@ def analyze_direct(lines, procedure_over_250, procedure_230_250):
         if re.match(direct_start_procedure_pattern, lines[i]):
             for j in range(i, len(lines)):
                 if re.search(direct_end_procedure_pattern, lines[j+1]):
+                    name = re.search(direct_function_name_pattern, lines[i]).group(1)
+                    name.replace("SYS-PROC", "")
+                    name.replace("$", "")
                     if 230 <= j - i <= 250:
-                        procedure_230_250.append(lines[i])
+                        procedure_230_250.append(name)
                     elif j - i > 250:
-                        procedure_over_250.append(lines[i])
+                        procedure_over_250.append(name)
                     break
 
     info["Direct Executable CMS2 Statements"] = executable_counter
     info["Single line Direct CMS2 comments"] = single_comments_counter
     return info
-
-# TODO everything
-def compare_files(original, modified):
-    return
 
 
 if __name__ == '__main__':
