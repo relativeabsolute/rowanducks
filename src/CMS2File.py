@@ -134,7 +134,7 @@ class CMS2File:
 
     @property
     def hl_data_lines(self):
-        return self._HL_data_lines
+        return self._hl_data_lines
 
     @hl_data_lines.setter
     def hl_data_lines(self, value):
