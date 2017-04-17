@@ -126,9 +126,23 @@ class Diff:
                 self.diff_list.append(diff_info)
             except:
                 # File not in repo (new file)
-                diff_info = CMS2FileDiff
-                diff_info.initial_size['Insturctions'] = 0
-                diff_info.initial_size['Comments'] = 0
+                file_info = regex.analyze(open(file).read().splitlines(), file)
+
+                if hasattr(file_info, 'direct_data_stmts') & hasattr(file_info, 'direct_comment_lines'):
+                    num_instructions = file_info.hl_exec_stmts + \
+                                       file_info.direct_exec_stmts + \
+                                       file_info.hl_data_stmts + \
+                                       file_info.direct_data_stmts
+                    num_comments = file_info.block_comments + file_info.direct_comment_lines
+                else:
+                    num_instructions = file_info.hl_exec_stmts  + file_info.hl_data_stmts
+                    num_comments = file_info.block_comments
+
+                diff_info = CMS2FileDiff(file, "ADDED", additions={ "Instructions": num_instructions,
+                                                                    "Comments": num_comments })
+
+                diff_info.initial_size["Instructions"] = 0
+                diff_info.initial_size["Comments"] = 0
                 # TODO: Use regex analyze method to get # instructions and comments
                 self.diff_list.append(diff_info)
 

@@ -1,6 +1,9 @@
 # Not sure if we'll use but including anyway
 class CMS2FileDiff:
-    def __init__(self, filename, status, additions, modifications, deletions):
+
+    def __init__(self, filename, status, additions,
+                 modifications={"Instructions":0, "Comments": 0},
+                 deletions={"Instructions":0, "Comments": 0}):
         self.filename = filename
         self.moduleName = ""
         self.additions = additions
