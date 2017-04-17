@@ -93,14 +93,13 @@ class Diff:
                         deletions["Comments"] += 1
                         previous = "Comments"
             elif re.search(modification_pattern, n):
-                if str(n).__contains__('+') | str(n).__contains__('-'):
-                    modifications[previous] += 1
+                    modifications[previous]+= 1
             line+=1
         # Addition/deletion patterns also show for self.modifications. Prevent double counting.
-        additions["Instructions"] -= modifications["Instructions"]
-        deletions["Instructions"] -= modifications["Instructions"]
-        additions["Comments"] -= modifications["Comments"]
-        deletions["Comments"] -= modifications["Comments"]
+        # additions["Instructions"] -= modifications["Instructions"]
+        # deletions["Instructions"] -= modifications["Instructions"]
+        # additions["Comments"] -= modifications["Comments"]
+        # deletions["Comments"] -= modifications["Comments"]
 
         file_status = "UNCHANGED"
         if(additions["Comments"] + additions["Instructions"] +
@@ -117,25 +116,23 @@ class Diff:
             # Get raw text of file from latest commit
             # Split by line into array
             try:
-                oldVersionFile = repo.git.show('HEAD:'+'src/'+file).split('\n')
+                oldVersionFile = repo.git.show('HEAD:'+'src/'+file).splitlines()
                 # Add delimiter back in for comparison purposes
-                for line in range(0, len(oldVersionFile)):
-                    oldVersionFile[line] = oldVersionFile[line].strip() +'\n'
                 file_content = open(file).read().splitlines()
-                for line in range(0,len(file_content)):
-                    file_content[line] = file_content[line].strip()
                 diff_info = self.analyze(file, oldVersionFile, file_content)
                 file_info = regex.analyze(oldVersionFile, file)
 
-                if hasattr(file_info, 'direct_data_stmts') & hasattr(file_info, 'direct_comment_lines'):
-                    num_instructions = file_info.hl_exec_stmts + \
+                if hasattr(file_info, 'direct_data_stmts') & \
+                        hasattr(file_info, 'direct_comment_lines') & \
+                        hasattr(file_info, 'direct_exec_stmts'):
+                    num_instructions = file_info.hl_exec_lines + \
                                        file_info.direct_exec_stmts + \
-                                       file_info.hl_data_stmts + \
+                                       file_info.hl_data_lines + \
                                        file_info.direct_data_stmts
                     num_comments = file_info.block_comments + file_info.direct_comment_lines
                 else:
-                    num_instructions = file_info.hl_exec_stmts + file_info.hl_data_stmts
-                    num_comments = file_info.block_comments
+                    num_instructions = file_info.hl_exec_lines + file_info.hl_data_lines
+                    num_comments = file_info.block_comment_lines
 
                 diff_info.initial_size['Instructions'] = num_instructions
                 diff_info.initial_size['Comments'] = num_comments
@@ -151,7 +148,7 @@ class Diff:
                                        file_info.direct_data_stmts
                     num_comments = file_info.block_comments + file_info.direct_comment_lines
                 else:
-                    num_instructions = file_info.hl_exec_stmts  + file_info.hl_data_stmts
+                    num_instructions = file_info.hl_exec_lines + file_info.hl_data_lines
                     num_comments = file_info.block_comments
 
                 diff_info = CMS2FileDiff(file, "ADDED", additions={ "Instructions": num_instructions,
