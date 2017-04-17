@@ -63,37 +63,39 @@ class Diff:
         block_comment_pattern = '([0-9]*\sCOMMENT.*)'
         # Used to help classify modification as instructions/comments
         previous = ""
+        line=0
         for n in diff:
             if re.search(addition_pattern, n):
-                # Order important
-                if re.search(block_comment_pattern, n):
-                    additions["Comments"] += 1
-                    previous = "Comments"
-                elif re.search(direct_single_comment_pattern, n):
-                    additions["Comments"] += 1
-                    previous = "Comments"
-                elif re.search(statement_pattern, n):
-                    additions["Instructions"] += 1
-                    previous = "Instructions"
-                else:
-                    additions["Comments"] += 1
-                    previous = "Comments"
+                    # Order important
+                    if re.search(block_comment_pattern, n):
+                        additions["Comments"] += 1
+                        previous = "Comments"
+                    elif re.search(direct_single_comment_pattern, n):
+                        additions["Comments"] += 1
+                        previous = "Comments"
+                    elif re.search(statement_pattern, n):
+                        additions["Instructions"] += 1
+                        previous = "Instructions"
+                    else:
+                        additions["Comments"] += 1
+                        previous = "Comments"
             elif re.search(deletion_pattern, n):
-                print(n)
-                if re.search(block_comment_pattern, n):
-                    deletions["Comments"] += 1
-                    previous = "Comments"
-                elif re.search(direct_single_comment_pattern, n):
-                    deletions["Comments"] += 1
-                    previous = "Comments"
-                elif re.search(statement_pattern, n):
-                    deletions["Instructions"] += 1
-                    previous = "Instructions"
-                else:
-                    deletions["Comments"] += 1
-                    previous = "Comments"
+                    if re.search(block_comment_pattern, n):
+                        deletions["Comments"] += 1
+                        previous = "Comments"
+                    elif re.search(direct_single_comment_pattern, n):
+                        deletions["Comments"] += 1
+                        previous = "Comments"
+                    elif re.search(statement_pattern, n):
+                        deletions["Instructions"] += 1
+                        previous = "Instructions"
+                    else:
+                        deletions["Comments"] += 1
+                        previous = "Comments"
             elif re.search(modification_pattern, n):
-                modifications[previous] += 1
+                if str(n).__contains__('+') | str(n).__contains__('-'):
+                    modifications[previous] += 1
+            line+=1
         # Addition/deletion patterns also show for self.modifications. Prevent double counting.
         additions["Instructions"] -= modifications["Instructions"]
         deletions["Instructions"] -= modifications["Instructions"]
@@ -118,11 +120,25 @@ class Diff:
                 oldVersionFile = repo.git.show('HEAD:'+'src/'+file).split('\n')
                 # Add delimiter back in for comparison purposes
                 for line in range(0, len(oldVersionFile)):
-                    oldVersionFile[line]+='\n'
-                diff_info = self.analyze(file, oldVersionFile, open(file).readlines())
+                    oldVersionFile[line] = oldVersionFile[line].strip() +'\n'
+                file_content = open(file).read().splitlines()
+                for line in range(0,len(file_content)):
+                    file_content[line] = file_content[line].strip()
+                diff_info = self.analyze(file, oldVersionFile, file_content)
                 file_info = regex.analyze(oldVersionFile, file)
-                diff_info.initial_size['Instructions'] = file_info.hl_exec_stmts
-                diff_info.initial_size['Comments'] = file_info.block_comments
+
+                if hasattr(file_info, 'direct_data_stmts') & hasattr(file_info, 'direct_comment_lines'):
+                    num_instructions = file_info.hl_exec_stmts + \
+                                       file_info.direct_exec_stmts + \
+                                       file_info.hl_data_stmts + \
+                                       file_info.direct_data_stmts
+                    num_comments = file_info.block_comments + file_info.direct_comment_lines
+                else:
+                    num_instructions = file_info.hl_exec_stmts + file_info.hl_data_stmts
+                    num_comments = file_info.block_comments
+
+                diff_info.initial_size['Instructions'] = num_instructions
+                diff_info.initial_size['Comments'] = num_comments
                 self.diff_list.append(diff_info)
             except:
                 # File not in repo (new file)
@@ -139,7 +155,11 @@ class Diff:
                     num_comments = file_info.block_comments
 
                 diff_info = CMS2FileDiff(file, "ADDED", additions={ "Instructions": num_instructions,
-                                                                    "Comments": num_comments })
+                                                                    "Comments": num_comments },
+                                         modifications = { "Instructions": 0,
+                                                                    "Comments": 0},
+                                         deletions = { "Instructions": 0,
+                                                                    "Comments": 0 })
 
                 diff_info.initial_size["Instructions"] = 0
                 diff_info.initial_size["Comments"] = 0
