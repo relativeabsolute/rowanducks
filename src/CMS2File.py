@@ -12,8 +12,8 @@ class CMS2File:
     hl_exec_stmts = 0
     hl_data_stmts = 0
     hl_data_lines = 0
-    HL_single_line_stmt_counter = 0
-    HL_multi_line_stmt_counter = 0
+    hl_single_line_stmt_counter = 0
+    hl_multi_line_stmt_counter = 0
     hl_comment_stmts = 0
     hl_comment_lines = 0
     hl_noncomment_lines = 0
@@ -109,7 +109,7 @@ class CMS2File:
     def hl_exec_stmts(self, value):
         self._hl_exec_stmts = value
         # Recalculate total exec stmts
-        # self.Total_exec_stmts = self.HL_exec_stmts + self.Direct_exec_stmts
+        # self.Total_exec_stmts = self.hl_exec_stmts + self.Direct_exec_stmts
     # ----------------------------
 
     @property
@@ -120,7 +120,7 @@ class CMS2File:
     def hl_exec_lines(self, value):
         self._hl_exec_lines = value
         # Recalculate total src lines
-        # self.Total_src_lines = self.HL_exec_lines + self.HL_data_lines + self.HL_comment_lines + self.HL_noncomment_lines + self.Direct_comment_lines
+        # self.Total_src_lines = self.hl_exec_lines + self.hl_data_lines + self.hl_comment_lines + self.hl_noncomment_lines + self.Direct_comment_lines
 
     # ----------------------------
     @property
@@ -140,7 +140,7 @@ class CMS2File:
     def hl_data_lines(self, value):
         self._hl_data_lines = value
         # Recalculate total src lines
-        # self.Total_src_lines = self.HL_exec_lines + self.HL_data_lines + self.HL_comment_lines + self.HL_noncomment_lines + self.Direct_comment_lines
+        # self.Total_src_lines = self.hl_exec_lines + self.hl_data_lines + self.hl_comment_lines + self.hl_noncomment_lines + self.Direct_comment_lines
     # ----------------------------
 
     @property
@@ -160,7 +160,7 @@ class CMS2File:
     def hl_comment_lines(self, value):
         self._hl_comments_lines = value
         # Recalculate total src lines
-        # self.Total_src_lines = self.HL_exec_lines + self.HL_data_lines + self.HL_comment_lines + self.HL_noncomment_lines + self.Direct_comment_lines
+        # self.Total_src_lines = self.hl_exec_lines + self.hl_data_lines + self.hl_comment_lines + self.hl_noncomment_lines + self.Direct_comment_lines
     # ----------------------------
 
     @property
@@ -171,7 +171,7 @@ class CMS2File:
     def hl_noncomment_lines(self, value):
         self._hl_noncomment_lines = value
         # Recalculate total src lines
-        # self.Total_src_lines = self.HL_exec_lines + self.HL_data_lines + self.HL_comment_lines + self.HL_noncomment_lines + self.Direct_comment_lines
+        # self.Total_src_lines = self.hl_exec_lines + self.hl_data_lines + self.hl_comment_lines + self.hl_noncomment_lines + self.Direct_comment_lines
     # ----------------------------
 
     @property
@@ -191,7 +191,7 @@ class CMS2File:
     def direct_exec_stmts(self, value):
         self._direct_exec_stmts = value
         # Recalculate total exec stmts
-        # self.Total_exec_stmts = self.HL_exec_stmts + self.Direct_exec_stmts
+        # self.Total_exec_stmts = self.hl_exec_stmts + self.Direct_exec_stmts
         self.recalculate_totals()
     # ----------------------------
 
@@ -212,7 +212,7 @@ class CMS2File:
     def direct_comment_lines(self, value):
         self._direct_comments_lines = value
         # Recalculate total src lines
-        # self.Total_src_lines = self.HL_exec_lines + self.HL_data_lines + self.HL_comment_lines + self.HL_noncomment_lines + self.Direct_comment_lines
+        # self.Total_src_lines = self.hl_exec_lines + self.hl_data_lines + self.hl_comment_lines + self.hl_noncomment_lines + self.Direct_comment_lines
         # recalculateTotals()
 
     def print_string(self):
