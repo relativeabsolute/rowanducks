@@ -47,7 +47,7 @@ class SourceMonitor:
         # main string contains the rows of data of the report
         self.main_string = ""
         for fileInfo in self.diff.diff_list:
-            name, add, mod, dele = self.diff.getDataAsString(fileInfo)
+            name, status, cpcr, add, mod, dele = self.diff.getDataAsString(fileInfo)
             self.main_string += name + ": " + "\t\t\t\t\t\t\t\t\t\t\t\t" \
                                 + add + mod + dele + "\n"
             self.main_string += "\t" + "\t| CHANGED   |\t\t\t\t\t| UNSPECIFIED\t\n"
