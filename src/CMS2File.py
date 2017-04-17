@@ -75,6 +75,7 @@ class CMS2File:
         self.hl_single_line_stmt_counter = file_info["High Level CMS2 Single Line Statements"]
         self.hl_multi_line_stmt_counter = file_info["Multi-line High Level CMS2 Statements"]
         self.total_exec_stmts = self.hl_exec_stmts + self.direct_exec_stmts
+        self.hl_data_lines = 0
 
     def recalculate_totals(self):
         CMS2File.total_src_lines = self.hl_exec_lines + self.hl_data_lines + self.hl_comment_lines + self.hl_noncomment_lines + self.direct_comment_lines
@@ -192,7 +193,7 @@ class CMS2File:
         self._direct_exec_stmts = value
         # Recalculate total exec stmts
         # self.Total_exec_stmts = self.hl_exec_stmts + self.Direct_exec_stmts
-        self.recalculate_totals()
+        # self.recalculate_totals()
     # ----------------------------
 
     @property
