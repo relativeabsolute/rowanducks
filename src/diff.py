@@ -22,10 +22,14 @@ class Diff:
         self.input_files = []
         self.CPCR = []
 
-    # TODO return files in subdirectories
-    # TODO only return files with correct extension
     def getFilesFromDir(self, directory):
-        return [os.path.join(directory, fn) for fn in next(os.walk(directory))[2]]
+        file_paths = []  # List which will store all of the full filepaths.
+
+        for root, directories, files in os.walk(directory):
+            for filename in files:
+                filepath = os.path.join(root, filename)
+                file_paths.append(filepath)  # Add it to the list.
+        return file_paths
 
     # Reads sys arguments to get files to run diff on
     def readInput(self):
@@ -96,35 +100,50 @@ class Diff:
         additions["Comments"] -= modifications["Comments"]
         deletions["Comments"] -= modifications["Comments"]
 
-        return CMS2FileDiff(filename, additions, modifications, deletions)
+        file_status = "UNCHANGED"
+        if(additions["Comments"] + additions["Instructions"] +
+           modifications["Comments"] + modifications["Instructions"] +
+           deletions["Comments"] + deletions["Instructions"] > 0):
+            file_status = "CHANGED"
+
+        return CMS2FileDiff(filename, file_status, additions, modifications, deletions)
 
     # Run diff between local file and same file from latest commit
     def run_diff_on_latest_commit(self):
         repo = git.Repo('../../rowanducks/')
         for file in self.input_files:
             # Get raw text of file from latest commit
-            unicode = repo.git.show('HEAD:'+'src/'+file)
-            # Split by line into arry
-            oldVersionFile = unicode.strip().split('\n')
-            # Add delimiter back in for comparison purposes
-            for line in range(0, len(oldVersionFile)):
-                oldVersionFile[line]+='\n'
-
-            diff_info = self.analyze(file, oldVersionFile, open(file).readlines())
-            file_info = regex.analyze(oldVersionFile, file)
-            diff_info.initial_size['Instructions'] = file_info.hl_exec_stmts
-            diff_info.initial_size['Comments'] = file_info.block_comments
-            self.diff_list.append(diff_info)
+            # Split by line into array
+            try:
+                oldVersionFile = repo.git.show('HEAD:'+'src/'+file).split('\n')
+                # Add delimiter back in for comparison purposes
+                for line in range(0, len(oldVersionFile)):
+                    oldVersionFile[line]+='\n'
+                diff_info = self.analyze(file, oldVersionFile, open(file).readlines())
+                file_info = regex.analyze(oldVersionFile, file)
+                diff_info.initial_size['Instructions'] = file_info.hl_exec_stmts
+                diff_info.initial_size['Comments'] = file_info.block_comments
+                self.diff_list.append(diff_info)
+            except:
+                # File not in repo (new file)
+                diff_info = CMS2FileDiff
+                diff_info.initial_size['Insturctions'] = 0
+                diff_info.initial_size['Comments'] = 0
+                # TODO: Use regex analyze method to get # instructions and comments
+                self.diff_list.append(diff_info)
 
     def getDataAsString(self, fileInfo):
-        return str(fileInfo.filename), str(fileInfo.additions), str(fileInfo.modifications), str(fileInfo.deletions)
+        return str(fileInfo.filename), str(fileInfo.status), str(fileInfo.CPCR), \
+               str(fileInfo.additions), str(fileInfo.modifications), str(fileInfo.deletions)
 
     def __str__(self):
         result = ""
         for fileInfo in self.diff_list:
-            name, add, mod, dele = self.getDataAsString(fileInfo)
+            name, status, cpcr, add, mod, dele = self.getDataAsString(fileInfo)
             result += "File: "
             result += name + "\n"
+            result += "Status: " + status + "\n"
+            result += "CPCR: " + cpcr + "\n"
             result += "Additions: " + add + "\n"
             result += "Modifications: " + mod + "\n"
             result += "Deletions: " + dele + "\n" + "\n"

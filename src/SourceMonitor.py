@@ -48,7 +48,7 @@ class SourceMonitor:
         # main string contains the rows of data of the report
         self.main_string = ""
         for fileInfo in self.diff.diff_list:
-            name, add, mod, dele = self.diff.getDataAsString(fileInfo)
+            name, status, cpcr, add, mod, dele = self.diff.getDataAsString(fileInfo)
             name = os.path.split(name)[1]
             #self.main_string += name + ": " + add + mod + dele 
             self.main_string += "{0:<{width}}".format(name, width=int(self.columns / 4))
