@@ -6,3 +6,6 @@ class CMS2FileDiff:
         self.additions = additions
         self.modifications = modifications
         self.deletions = deletions
+
+        # this will contain initial number of instructions and comments
+        self.initial_size = {}

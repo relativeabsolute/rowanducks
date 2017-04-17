@@ -53,7 +53,8 @@ class SourceMonitor:
             #self.main_string += name + ": " + add + mod + dele 
             self.main_string += "{0:<{width}}".format(name, width=int(self.columns / 4))
             self.main_string += "|{0:^{width}}|".format("CHANGED", width=int(self.columns / 12) - 2)
-            self.main_string += "{0:{fill}<{width}}".format("", fill = " ", width = int(self.columns / 8))
+            self.main_string += "{0:<{width}}".format(str(fileInfo.initial_size["Instructions"]) + "I", width = int(self.columns / 16))
+            self.main_string += "{0:<{width}}".format(str(fileInfo.initial_size["Comments"]) + "C", width = int(self.columns / 16))
             self.main_string += "|{0:^{width}}".format(" UNSPECIFIED", width = int(self.columns / 8))
             self.main_string += "{0:<{width}}".format(str(fileInfo.additions["Instructions"])+ "I", width = int(self.columns / 20))
             self.main_string += "{0:<{width}}".format(str(fileInfo.additions["Comments"]) + "C", width = int(self.columns / 20))

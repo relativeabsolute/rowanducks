@@ -109,7 +109,11 @@ class Diff:
             for line in range(0, len(oldVersionFile)):
                 oldVersionFile[line]+='\n'
 
-            self.diff_list.append(self.analyze(file, oldVersionFile, open(file).readlines()))
+            diff_info = self.analyze(file, oldVersionFile, open(file).readlines())
+            file_info = regex.analyze(oldVersionFile, file)
+            diff_info.initial_size['Instructions'] = file_info.hl_exec_lines()
+            diff_info.initial_size['Comments'] = file_info.hl_comment_lines()
+            self.diff_list.append(diff_info)
 
     def getDataAsString(self, fileInfo):
         return str(fileInfo.filename), str(fileInfo.additions), str(fileInfo.modifications), str(fileInfo.deletions)
