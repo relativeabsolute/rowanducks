@@ -16,6 +16,10 @@ sample_file = "/SampleDirectory/CMS2YSample.txt"
 sample_HL_file = "/SampleDirectory/CMS-2_HighLevel_2.txt"
 valid_name = False
 
+block_comments = 0
+comment_lines = 0
+instructions = 0
+
 # Accepts 'X' followed by any number of digits or 'A/' followed by any number of digits.
 exec_pattern = '(X[0-9]+|A/[0-9]+)'
 
@@ -57,6 +61,7 @@ def main():
     finished = False
     input_files = []
     list_cms2file = []
+
     # Takes arguments (filenames) from command line separated by spaces
     # Could update this to take a directory and analyze all files in directory
     for n in range(1, len(sys.argv)):
@@ -71,6 +76,7 @@ def main():
         list_cms2file.append(split_file(location))
     for file_data in list_cms2file:
         print (file_data.print_string())
+
     return list_cms2file
 
 
@@ -92,22 +98,23 @@ def split_file(file):
     # print(line)
     return analyze(f, file)
 
-
 # Analyzes given text
 # Currently it only counts the number of executable lines and in line comments.
 # Returns findings in an OrderedDict on completion
 def analyze(lines, name):
+    global block_comments
+    global comment_lines
+    global instructions
+
     # Before all else, check to see if valid file extension
     check_file_extension(name)
-    code_length = len(lines);
+    lines_length = len(lines)
 
     goto_counter = 0
 
-    comments = {0, 0}
-    block_comments = 0
-    block_comment_lines = 0
-    #block_comment_counter = 0
-    #block_comment_line_counter = 0
+
+    block_comment_counter = 0
+    comment_line_counter = 0
     block_comment_dictionary = {}
 
     note_counter = 0
@@ -127,14 +134,14 @@ def analyze(lines, name):
     # Changed the "for in" loop to while so we can change loop counter when needed (see lines 100, 115)
     i = 0
     file_info = OrderedDict()
-    while i < code_length:
+    while i < lines_length:
         current_line = ""
         comment_text = ""
         statement_text = ""
 
         # Detects Direct CMS-2 code blocks and sends the entire block to be analyzed.
         if re.search('(DIRECT\s*\$)', lines[i]):
-            for j in range(i, code_length):
+            for j in range(i, lines_length):
                 if re.search("(CMS-2\s*\$)", lines[j+1]):
                     file_info.update(analyze_direct(lines[i:j], procedure_over_250, procedure_230_250))
                     i = j + 1  # Update loop counter so we don't analyze code block more than once
@@ -160,7 +167,7 @@ def analyze(lines, name):
 
             # Checks to see if the current line is the start of a procedure
             if re.match(hl_start_procedure_pattern, lines[i]):
-                for j in range(i, code_length):
+                for j in range(i, lines_length):
                     name = re.search(hl_function_name_pattern, lines[i]).group(1)
                     name.replace("PROCEDURE", "")
                     name.replace("$", "")
@@ -178,10 +185,22 @@ def analyze(lines, name):
             # Checks first to see if a block comment is present. If not, checks for single line comments.
             # Using re.IGNORECASE because some comments are in lowercase in the sample
             elif re.search(block_comment_pattern, lines[i], re.IGNORECASE):
-
-                bc, bcl, i = comment_counter(block_comment_dictionary, comment_text, lines, i)
-                block_comments += bc
-                block_comment_lines += bcl
+                block_comment_counter += 1
+                # It loops through next lines until '$' is found (end of the comment).
+                # Then it appends the message each iteration.
+                for j in range(i, lines_length):
+                    comment_line_counter += 1
+                    # TODO Maybe find a way to trim out tabs/repeating line numbers from message?
+                    comment_text += lines[j]
+                    block_comment_dictionary[i] = comment_text
+                    if "$" in lines[j]:
+                        # We should update loop counter so we don't double count
+                        i = j
+                        break
+                """bc, bcl, i = comment_counter(block_comment_dictionary, comment_text, lines, i)
+                block_comment_counter += bc
+                #chris_blockCount = block_comments
+                comment_line_counter += bcl """
 
             # Check if it's a single liner
             elif re.search(hl_statement_pattern, lines[i]):
@@ -191,7 +210,7 @@ def analyze(lines, name):
             elif re.search('(.*\s[0-9]+)', lines[i]):
                 # Not sure what information we want to record about these multi line statements
                 hl_multi_statement_counter += 1
-                for j in range(i, code_length):
+                for j in range(i, lines_length):
                     hl_multi_statement_lines += 1
                     if "$" in lines[j]:
                         # Update counter to prevent double counting
@@ -200,19 +219,24 @@ def analyze(lines, name):
             # Loop counter
             i += 1
 
+    # assign globals for getters
+    block_comments = block_comment_counter
+    comment_lines = comment_line_counter
+    instructions = hl_executable_counter
+
     # System Output:
-    file_info["Number of Lines"] = code_length
+    file_info["Number of Lines"] = lines_length
     file_info["Go-To Statements"] = goto_counter
     file_info["Notes"] = note_counter
-    file_info["Block comments"] = block_comments
-    file_info["Block comment lines"] = block_comment_lines
-    file_info["Number of non-comments"] = code_length - block_comment_lines
+    file_info["Block comments"] = block_comment_counter
+    file_info["Block comment lines"] = comment_line_counter
+    file_info["Number of non-comments"] = lines_length - comment_line_counter
     file_info["High Level CMS2 Single Line Statements"] = hl_statement_counter
     file_info["Multi-line High Level CMS2 Statements"] = hl_multi_statement_counter
     file_info["Lines of Multi-line High Level CMS2 Statements"] = hl_multi_statement_lines
     file_info["Lines containing High Level Data Statements"] = hl_data_statement_counter
     file_info["HL Executable Statements"] = hl_executable_counter
-    file_info["Total lines"] = code_length
+    file_info["Total lines"] = lines_length
 
     if file_info.__contains__("Direct Executable CMS2 Statements"):
         print "" #do nothing
@@ -233,9 +257,17 @@ def analyze(lines, name):
     # fileInfo["Note Dictionary"] = note_dictionary
     return CMS2File(name, file_info)
 
+"""Getters"""
+def getComments():
+    return block_comments, comment_lines
+
+def getInstructions():
+    return instructions
+
+
+
+
 """Regex Pattern Functions"""
-
-
 def comment_counter(block_comment_dictionary, comment_text, lines, current_line):
     block_comments = 0
     block_comment_lines = 0
