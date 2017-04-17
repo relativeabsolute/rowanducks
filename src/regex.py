@@ -238,14 +238,10 @@ def analyze(lines, name):
     file_info["HL Executable Statements"] = hl_executable_counter
     file_info["Total lines"] = lines_length
 
-    if file_info.__contains__("Direct Executable CMS2 Statements"):
-        print "" #do nothing
-    else:
+    if "Direct Executable CMS2 Statements" not in file_info:
         file_info["Direct Executable CMS2 Statements"] = 0
 
-    if file_info.__contains__("Single line Direct CMS2 comments"):
-        print "" #do nothing
-    else:
+    if "Single line Direct CMS2 comments" not in file_info:
         file_info["Single line Direct CMS2 comments"] = 0
 
 
