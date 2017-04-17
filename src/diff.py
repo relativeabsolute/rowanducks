@@ -3,6 +3,7 @@ import re
 import git
 import sys
 import os
+import regex
 from CMS2FileDiff import CMS2FileDiff
 
 # README
@@ -111,8 +112,8 @@ class Diff:
 
             diff_info = self.analyze(file, oldVersionFile, open(file).readlines())
             file_info = regex.analyze(oldVersionFile, file)
-            diff_info.initial_size['Instructions'] = file_info.hl_exec_lines()
-            diff_info.initial_size['Comments'] = file_info.hl_comment_lines()
+            diff_info.initial_size['Instructions'] = file_info.hl_exec_stmts
+            diff_info.initial_size['Comments'] = file_info.block_comments
             self.diff_list.append(diff_info)
 
     def getDataAsString(self, fileInfo):
