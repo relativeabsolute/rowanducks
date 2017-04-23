@@ -47,15 +47,15 @@ class Diff:
         diff = difflib.ndiff(sample1, sample2)
 
         # Accepts a '+' followed by a space.
-        addition_pattern = '(\+ .*)'
+        addition_pattern = '(\A\+ .*)'
         additions = {"Instructions": 0, "Comments": 0}
 
         # Accepts a '-' followed by a space.
-        deletion_pattern = '(\- .*)'
+        deletion_pattern = '(\A\- .*)'
         deletions = {"Instructions": 0, "Comments": 0}
 
         # Accepts a '?' followed by a space.
-        modification_pattern = '(\? .*)'
+        modification_pattern = '(\A\? .*)'
         modifications = {"Instructions": 0, "Comments": 0}
 
         statement_pattern = '(.*\$\n)'
@@ -63,7 +63,6 @@ class Diff:
         block_comment_pattern = '([0-9]*\sCOMMENT.*)'
         # Used to help classify modification as instructions/comments
         previous = ""
-        line=0
         for n in diff:
             if re.search(addition_pattern, n):
                     # Order important
@@ -94,7 +93,8 @@ class Diff:
                         previous = "Comments"
             elif re.search(modification_pattern, n):
                     modifications[previous]+= 1
-            line+=1
+                    additions[previous]-=1
+                    deletions[previous]-=1
         # Addition/deletion patterns also show for self.modifications. Prevent double counting.
         # additions["Instructions"] -= modifications["Instructions"]
         # deletions["Instructions"] -= modifications["Instructions"]
@@ -116,20 +116,20 @@ class Diff:
             # Get raw text of file from latest commit
             # Split by line into array
             try:
+                # If file is in repo
                 oldVersionFile = repo.git.show('HEAD:'+'src/'+file).splitlines()
                 # Add delimiter back in for comparison purposes
                 file_content = open(file).read().splitlines()
                 diff_info = self.analyze(file, oldVersionFile, file_content)
                 file_info = regex.analyze(oldVersionFile, file)
 
-                if hasattr(file_info, 'direct_data_stmts') & \
-                        hasattr(file_info, 'direct_comment_lines') & \
-                        hasattr(file_info, 'direct_exec_stmts'):
+                # If code contained direct CMS2
+                if hasattr(file_info, 'direct_comments') & hasattr(file_info, 'direct_exec_stmts'):
                     num_instructions = file_info.hl_exec_lines + \
                                        file_info.direct_exec_stmts + \
-                                       file_info.hl_data_lines + \
-                                       file_info.direct_data_stmts
-                    num_comments = file_info.block_comments + file_info.direct_comment_lines
+                                       file_info.hl_data_stmts
+                    num_comments = file_info.block_comment_lines + file_info.direct_comments
+                # If no direct CMS2
                 else:
                     num_instructions = file_info.hl_exec_lines + file_info.hl_data_lines
                     num_comments = file_info.block_comment_lines
@@ -140,16 +140,16 @@ class Diff:
             except:
                 # File not in repo (new file)
                 file_info = regex.analyze(open(file).read().splitlines(), file)
-
-                if hasattr(file_info, 'direct_data_stmts') & hasattr(file_info, 'direct_comment_lines'):
-                    num_instructions = file_info.hl_exec_stmts + \
+                # If code contained direct CMS2
+                if hasattr(file_info, 'direct_exec_stmts') & hasattr(file_info, 'direct_comments'):
+                    num_instructions = file_info.hl_exec_lines + \
                                        file_info.direct_exec_stmts + \
-                                       file_info.hl_data_stmts + \
-                                       file_info.direct_data_stmts
-                    num_comments = file_info.block_comments + file_info.direct_comment_lines
+                                       file_info.hl_data_stmts
+                    num_comments = file_info.block_comment_lines + file_info.direct_comments
+                # If no direct CMS2
                 else:
                     num_instructions = file_info.hl_exec_lines + file_info.hl_data_lines
-                    num_comments = file_info.block_comments
+                    num_comments = file_info.block_comment_lines
 
                 diff_info = CMS2FileDiff(file, "ADDED", additions={ "Instructions": num_instructions,
                                                                     "Comments": num_comments },
@@ -160,7 +160,6 @@ class Diff:
 
                 diff_info.initial_size["Instructions"] = 0
                 diff_info.initial_size["Comments"] = 0
-                # TODO: Use regex analyze method to get # instructions and comments
                 self.diff_list.append(diff_info)
 
     def getDataAsString(self, fileInfo):
