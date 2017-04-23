@@ -58,7 +58,7 @@ class Diff:
         modification_pattern = '(\A\? .*)'
         modifications = {"Instructions": 0, "Comments": 0}
 
-        statement_pattern = '(.*\$\n)'
+        statement_pattern = '(.*\$)'
         direct_single_comment_pattern = '(\. .*)'
         block_comment_pattern = '([0-9]*\sCOMMENT.*)'
         # Used to help classify modification as instructions/comments
