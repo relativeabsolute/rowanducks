@@ -57,20 +57,20 @@ direct_function_name_pattern = '(\s*[a-zA-Z]*\s*SYS-PROC\s*\$)'
 hl_function_name_pattern = '(PROCEDURE\s*[a-zA-Z]*\s\$)'
 
 
-def main():
+def main(arg_list):
     finished = False
     input_files = []
     list_cms2file = []
 
     # Takes arguments (filenames) from command line separated by spaces
     # Could update this to take a directory and analyze all files in directory
-    for n in range(1, len(sys.argv)):
-        if os.path.isfile(sys.argv[n]):
-            input_files.append(sys.argv[n])
-        elif os.path.isdir(sys.argv[n]):
-            list = get_files_from_dir(sys.argv[n])
-            for file in list:
-                input_files.append(file)
+    for item in arg_list:
+        if os.path.isfile(item):
+            input_files.append(item)
+        elif os.path.isdir(item):
+            file_list = get_files_from_dir(item)
+            for file_name in file_list:
+                input_files.append(file_name)
 
     for location in input_files:
         list_cms2file.append(split_file(location))
@@ -353,4 +353,4 @@ def analyze_direct(lines, procedure_over_250, procedure_230_250):
 
 
 if __name__ == '__main__':
-    main()
+    main(sys.argv[1:])
