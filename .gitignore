@@ -93,3 +93,4 @@ src/.idea/src.iml
 # vim files
 *.*~
 *.swp
+*.swo

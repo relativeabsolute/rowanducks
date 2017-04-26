@@ -3,8 +3,8 @@ import re
 import git
 import sys
 import os
-import regex
-from CMS2FileDiff import CMS2FileDiff
+from .regex import analyze
+from .CMS2FileDiff import CMS2FileDiff
 
 # README
 # To run this program do one of the following:
@@ -32,15 +32,22 @@ class Diff:
         return file_paths
 
     # Reads sys arguments to get files to run diff on
-    def readInput(self):
-        for n in range(1, len(sys.argv)):
-            if os.path.isfile(sys.argv[n]):
-                self.input_files.append(sys.argv[n])
-                # print sys.argv[n]
-            elif os.path.isdir(sys.argv[n]):
-                list = self.getFilesFromDir(sys.argv[n])
-                for file in list:
-                    self.input_files.append(file)
+    def readInput(self, files):
+        for item in files:
+            if os.path.isfile(item):
+                self.input_files.append(item)
+            elif os.path.isdir(item):
+                dir_list = self.getFilesFromDir(item)
+                for dir_file in dir_list:
+                    self.input_files.append(dir_file)
+        #for n in range(1, len(sys.argv)):
+        #    if os.path.isfile(sys.argv[n]):
+        #        self.input_files.append(sys.argv[n])
+        #        # print sys.argv[n]
+        #    elif os.path.isdir(sys.argv[n]):
+        #        list = self.getFilesFromDir(sys.argv[n])
+        #        for file in list:
+        #            self.input_files.append(file)
 
     # Analysis method. Returns a CMS2FileDiff
     def analyze(self, filename, sample1, sample2):
@@ -111,7 +118,7 @@ class Diff:
 
     # Run diff between local file and same file from latest commit
     def run_diff_on_latest_commit(self):
-        repo = git.Repo('../../rowanducks/')
+        repo = git.Repo('.')
         for file in self.input_files:
             # Get raw text of file from latest commit
             # Split by line into array
@@ -121,7 +128,7 @@ class Diff:
                 # Add delimiter back in for comparison purposes
                 file_content = open(file).read().splitlines()
                 diff_info = self.analyze(file, oldVersionFile, file_content)
-                file_info = regex.analyze(oldVersionFile, file)
+                file_info = analyze(oldVersionFile, file)
 
                 # If code contained direct CMS2
                 if hasattr(file_info, 'direct_comments') & hasattr(file_info, 'direct_exec_stmts'):
@@ -182,7 +189,7 @@ class Diff:
 if __name__ == "__main__":
 
     d = Diff()
-    d.readInput()
+    d.readInput(sys.argv[1:])
     d.run_diff_on_latest_commit()
     print("Diff results")
     print(str(d))

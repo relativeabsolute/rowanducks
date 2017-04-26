@@ -1,0 +1,39 @@
+13 			TABLE WTMTSOUT V 2 1 		                                              $	       2413000032
+13 1 00000		   WTMTSOUT     RES       0
+			*
+14			TITLE:	TEMPORARY STORAGE OUTPUT BUFFER (WTMTSOUT)                                 2413000033
+14			PURPOSE:   STORE TRACK DATA REQUEST MESSAGE (MT-117)                               2413000034
+14					FOR TRANSMISSION TO C&D			                                           2413000035
+14			REMARKS:   MESSAGE HEADER CONTAINS TWO WORDS,                                      2413000036
+14 					REMAINDER OF OUTPUT BUFFER CONTAINS UP TO                                  2413000037
+14 					150 REQUESTS OF 2 WORDS EACH, DEFINED AS                                   2413000039
+14					TABLE WTMTMSGO (MESSAGE OUT)                                               2413000040
+14 			INDEXING:    ALWAYS INDEXED BY 0                                                                                                                                     2413000041
+14			FUNCTION:   OUTPUT BUFFER                                                                                                                                               2413000042
+14			$								                                                   2413000043
+15					FIELD MSGSZ I 16 S 0 31                                          $         2413000044
+
+16			*				MESSAGE SIZE		                                               2413000045
+16							MIN:3  MAX:302                                                     2413000046
+16							UNITS:N/A  STATUS:DC		                             $         2413000047
+17					FIELD DC I 4 U 0 15			                                     $         2413000048
+
+18			*				DISTRIBUTION CODE 		                                           2413000049
+18							MIN: 0  MAX: 15	                                                   2413000050
+18							UNITS:N/A  STATUS:DC     $                                         2413000051
+19					FIELD MSGTY I 12 U 0 11			                                 $         2413000052
+
+20			*				MESSAGE TYPE 			                                           2413000053
+20							MIN:317  MAX:317                                                   2413000054
+20							UNITS:N/A  STATUS:DC     $                                         2413000055
+21					FIELD MSGTT A 32 S 10 1 31                                       $         2413000056
+
+22			*				MESSAGE TIME TAG		                                           2413000057
+22							MIN:0  MAX:523287.999                                              2413000058
+23			END-TABLE  WTMTSOUT
+
+24          SWITCH INOP $                                                                      2413000059
+25              IN1 $                                                                          2413000060
+26              IN2 $                                                                          2413000061
+27              IN3 $                                                                          2413000062
+28          END-SWITCH INOP $                                                                  2413000063

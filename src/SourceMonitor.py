@@ -1,8 +1,9 @@
 # Author: Johan Burke
 
+import sys
 import os.path
 from datetime import datetime
-from diff import Diff
+from .diff import Diff
 
 
 class SourceMonitor:
@@ -85,9 +86,9 @@ class SourceMonitor:
         self.get_rows()
 
 
-def main():
+def main(args):
     d1 = Diff()
-    d1.readInput()
+    d1.readInput(args)
     d1.run_diff_on_latest_commit()
     # diffs = [d1]
 
@@ -100,4 +101,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    main(sys.argv[1:])

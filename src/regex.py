@@ -10,7 +10,7 @@ import re
 import os
 import sys
 from collections import OrderedDict
-from CMS2File import CMS2File
+from .CMS2File import CMS2File
 
 sample_file = "/SampleDirectory/CMS2YSample.txt"
 sample_HL_file = "/SampleDirectory/CMS-2_HighLevel_2.txt"
