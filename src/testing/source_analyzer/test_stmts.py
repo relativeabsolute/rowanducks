@@ -3,12 +3,17 @@
 # Author: Johan Burke
 
 import unittest
-from ..regex import main
+import os
+from src.regex import main
 
 class StatementsTestCase(unittest.TestCase):
     # run source analyzer on directory of input
     def setUp(self):
-        self.cms2files = main('../data/SampleDirectory')
+        print('setting up StatementsTestCase')
+        print(os.getcwd())
+        self.cms2files = main(['src/data/SampleDirectory'])
 
     def test_linenums(self):
+        print('running test_linenums')
+        # check that line number is correct here
         pass

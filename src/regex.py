@@ -84,6 +84,8 @@ def get_files_from_dir(directory):
     file_paths = []  # List which will store all of the full file paths.
 
     for root, directories, files in os.walk(directory):
+        #print("root = {0}".format(root))
+        #print("files = {0}".format(str(files)))
         for filename in files:
             filepath = os.path.join(root, filename)
             file_paths.append(filepath)  # Add it to the list.
