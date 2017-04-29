@@ -4,7 +4,7 @@ import git
 import sys
 import os
 from .regex import analyze
-from .CMS2FileDiff import CMS2FileDiff
+from CMS2FileDiff import CMS2FileDiff
 
 # README
 # To run this program do one of the following:
@@ -146,7 +146,7 @@ class Diff:
                 self.diff_list.append(diff_info)
             except:
                 # File not in repo (new file)
-                file_info = regex.analyze(open(file).read().splitlines(), file)
+                file_info = analyze(open(file).read().splitlines(), file)
                 # If code contained direct CMS2
                 if hasattr(file_info, 'direct_exec_stmts') & hasattr(file_info, 'direct_comments'):
                     num_instructions = file_info.hl_exec_lines + \
