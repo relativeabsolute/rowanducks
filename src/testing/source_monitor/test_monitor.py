@@ -6,6 +6,7 @@ from src.diff import Diff
 from src.regex import main
 from src.SourceMonitor import SourceMonitor
 import json
+from datetime import datetime
 
 class TestChangesTestCase(unittest.TestCase):
     # run source monitor on directory of input
@@ -15,7 +16,7 @@ class TestChangesTestCase(unittest.TestCase):
         self.diff = Diff()
         self.diff.readInput('../data/SampleDirectory')
         self.diff.run_diff_on_latest_commit()
-
+        self.sm = SourceMonitor(self.diff)
         # Analyze files
         self.cms2files = main(['src/data/SampleDirectory'])
         # Load expected output
@@ -40,20 +41,21 @@ class TestChangesTestCase(unittest.TestCase):
             for field in change_types:
                 self.assertEqual(file.getattr(field), expected[field])
 
-    # Not sure what to do
-    def test_monitor_report(self):
-        print('running test_monitor_report')
-        pass
-
     def test_monitor_format(self):
         print('running test_monitor_format')
-        sm = SourceMonitor(self.diff)
+        headings = ['MODULE', 'FILE STATUS', 'INITIAL SIZE', 'CPCR', 'ADDITIONS', 'MODIFICATIONS', 'DELETIONS']
+        for heading in headings:
+            self.assertTrue(heading in self.sm.header_string)
+        current_date = datetime.now().strftime("%d/%b/%Y")
+        self.assertTrue(current_date in self.sm.header_string)
+
+    def test_monitor_report(self):
+        print('running test_monitor_report')
         columns = open('../expected_output/monitor_headings.txt').read()
-        self.assertEqual(columns, sm.main_string)
-        pass
+        self.assertEqual(columns, self.sm.main_string)
 
     def find_file(self, expected_output, test_data):
         for file in expected_output:
             if file['filename'] == test_data.filename:
                 return file
-        return False
+        self.assertTrue(False)
