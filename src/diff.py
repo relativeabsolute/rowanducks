@@ -4,7 +4,7 @@ import git
 import sys
 import os
 from .regex import analyze
-from CMS2FileDiff import CMS2FileDiff
+from .CMS2FileDiff import CMS2FileDiff
 
 # README
 # To run this program do one of the following:
