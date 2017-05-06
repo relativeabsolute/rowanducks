@@ -13,15 +13,18 @@ class TestChangesTestCase(unittest.TestCase):
     def setUp(self):
         print('setting up TestChangesTestCase')
         print(os.getcwd())
+        print('constructing diff object')
         self.diff = Diff()
-        self.diff.readInput('../data/SampleDirectory')
+        print('reading input from sample directory')
+        self.diff.readInput(['src/testing/data/SampleDirectory'])
+        print('running on latest commit')
         self.diff.run_diff_on_latest_commit()
         self.sm = SourceMonitor(self.diff)
         # Analyze files
         self.cms2files = main(['src/data/SampleDirectory'])
         # Load expected output
-        self.num_changes = json.loads(open('../expected_output/num_changes.json').read())
-        self.change_types = json.loads(open('../expected_output/change_types.json').read())
+        self.num_changes = json.loads(open('src/testing/expected_output/num_changes.json').read())
+        self.change_types = json.loads(open('src/testing/expected_output/change_types.json').read())
 
     def test_changes(self):
         print('running test_changes')
@@ -51,7 +54,7 @@ class TestChangesTestCase(unittest.TestCase):
 
     def test_monitor_report(self):
         print('running test_monitor_report')
-        columns = open('../expected_output/monitor_headings.txt').read()
+        columns = open('src/testing/expected_output/monitor_headings.txt').read()
         self.assertEqual(columns, self.sm.main_string)
 
     def find_file(self, expected_output, test_data):
