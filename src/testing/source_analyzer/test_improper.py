@@ -11,7 +11,7 @@ class ImproperTestCase(unittest.TestCase):
     # with incorrect extensions match the ones found
     # in num_bad_ext.txt.
     def test_bad_ext(self):
-        # TODO check if bad extensions are the same
+        # check if bad extensions are the same
         pass
 
     # 1.5.2 test_misplace_end_sys...ok
@@ -19,14 +19,14 @@ class ImproperTestCase(unittest.TestCase):
     # of misplaced "END-SYSTEM" statements match the number
     # found in num_misplaced_end_sys.txt.
     def test_misplace_end_sys(self):
-        # TODO check if end system states are correct
+        # check if end system states are correct
         pass
 
     # 1.5.3 test_multi_component...ok
     # Will print ok if and only if the number matches
     # the number found in num_multi_component.txt.
     def test_multi_component(self):
-        # TODO check if multiple compontents are correct
+        # check if multiple compontents are correct
         pass
 
     # 1.5.4 test_name_mismatch...ok
@@ -34,7 +34,7 @@ class ImproperTestCase(unittest.TestCase):
     # mismatches between component name and filename
     # match the number in num_name_mismatch.txt.
     def test_name_mismatch(self):
-        # TODO check if the name and filename match the number here
+        # check if the name and filename match the number here
         pass
 
 if __name__ == "__main__":
