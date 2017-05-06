@@ -1,5 +1,6 @@
 # script used to test improper cases (see verification Script Steps: 1.5.1-1.5.4)
 # Author: Chris Curreri
+# Note: Class connot be completed since functionality is not implemented.
 
 import unittest
 from src.regex import main
@@ -38,5 +39,5 @@ class ImproperTestCase(unittest.TestCase):
         pass
 
 if __name__ == "__main__":
-    print("Running TestImproper:")
+    print('Running TestImproper:')
     unittest.main()

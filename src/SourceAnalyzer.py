@@ -8,6 +8,7 @@ from .CMS2File import CMS2File
 from datetime import datetime
 
 class SourceAnalyzer:
+
     @property
     def header_str(self):
         return self._header_str
