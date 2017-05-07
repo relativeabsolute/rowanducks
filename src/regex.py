@@ -236,6 +236,8 @@ def analyze(lines, name):
     file_info["Lines of Multi-line High Level CMS2 Statements"] = hl_multi_statement_lines
     file_info["Lines containing High Level Data Statements"] = hl_data_statement_counter
     file_info["HL Executable Statements"] = hl_executable_counter
+    file_info["Procedures over 250 LoC"] = procedure_over_250
+    file_info["Procedures 230-250 LoC"] = procedure_230_250
     file_info["Total lines"] = lines_length
 
     if file_info.__contains__("Direct Executable CMS2 Statements"):
