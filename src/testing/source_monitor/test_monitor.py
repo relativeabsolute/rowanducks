@@ -58,7 +58,9 @@ class TestChangesTestCase(unittest.TestCase):
         self.assertEqual(columns, self.sm.main_string)
 
     def find_file(self, expected_output, test_data):
+        to_find = os.path.split(test_data.filename)[1]
+        print('calling find_file for {0}'.format(to_find))
         for file in expected_output:
-            if file['filename'] == test_data.filename:
+            if file['name'] == to_find:
                 return file
         self.assertTrue(False)
