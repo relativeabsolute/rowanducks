@@ -170,7 +170,7 @@ class Diff:
                 self.diff_list.append(diff_info)
 
     def getDataAsString(self, fileInfo):
-        return str(fileInfo.filename), str(fileInfo.status), str(fileInfo.CPCR), \
+        return str(fileInfo.name), str(fileInfo.status), str(fileInfo.CPCR), \
                str(fileInfo.additions), str(fileInfo.modifications), str(fileInfo.deletions)
 
     def __str__(self):

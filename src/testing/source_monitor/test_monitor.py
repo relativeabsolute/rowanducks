@@ -33,7 +33,10 @@ class TestChangesTestCase(unittest.TestCase):
         for file_diff in self.diff.diff_list:
             expected = self.find_file(self.num_changes, file_diff)
             for attr in diff_attr:
-                self.assertEqual(file_diff.getattr(file_diff, attr), expected['attr'])
+                if attr != 'filename':
+                    self.assertEqual(getattr(file_diff, attr), expected[attr])
+                else:
+                    self.assertEqual(os.path.split(getattr(file_diff,attr))[1], expected[attr])
 
     def test_change_types(self):
         print('running test_change_types')
@@ -42,7 +45,10 @@ class TestChangesTestCase(unittest.TestCase):
         for file in self.cms2files:
             expected = self.find_file(self.change_types, file)
             for field in change_types:
-                self.assertEqual(file.getattr(field), expected[field])
+                if field != 'name':
+                    self.assertEqual(getattr(file, field), expected[field])
+                else:
+                    self.assertEqual(os.path.split(getattr(file,field))[1], expected[field])
 
     def test_monitor_format(self):
         print('running test_monitor_format')
@@ -58,7 +64,7 @@ class TestChangesTestCase(unittest.TestCase):
         self.assertEqual(columns, self.sm.main_string)
 
     def find_file(self, expected_output, test_data):
-        to_find = os.path.split(test_data.filename)[1]
+        to_find = os.path.split(test_data.name)[1]
         print('calling find_file for {0}'.format(to_find))
         for file in expected_output:
             if file['name'] == to_find:
