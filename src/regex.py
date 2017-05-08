@@ -10,7 +10,7 @@ import re
 import os
 import sys
 from collections import OrderedDict
-from CMS2File import CMS2File
+from .CMS2File import CMS2File
 
 sample_file = "/SampleDirectory/CMS2YSample.txt"
 sample_HL_file = "/SampleDirectory/CMS-2_HighLevel_2.txt"
@@ -84,6 +84,8 @@ def get_files_from_dir(directory):
     file_paths = []  # List which will store all of the full file paths.
 
     for root, directories, files in os.walk(directory):
+        #print("root = {0}".format(root))
+        #print("files = {0}".format(str(files)))
         for filename in files:
             filepath = os.path.join(root, filename)
             file_paths.append(filepath)  # Add it to the list.
