@@ -87,3 +87,10 @@ ENV/
 
 # Rope project settings
 .ropeproject
+*.xml
+src/.idea/src.iml
+
+# vim files
+*.*~
+*.swp
+*.swo
