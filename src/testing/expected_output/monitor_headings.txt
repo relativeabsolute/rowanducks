@@ -1,0 +1,9 @@
+CMS-2_HighLevel2.txt                    | UNCHANGED |33I       22C       |     UNSPECIFIED    0I      0C      0I      0C       |      0I      0C
+CMS-2_HighLevel2_Edited.txt             | UNCHANGED |33I       23C       |     UNSPECIFIED    0I      0C      0I      0C       |      0I      0C
+CMS-2_HighLevel_2.txt                   | UNCHANGED |283I      298C      |     UNSPECIFIED    0I      0C      0I      0C       |      0I      0C
+CMS2ComplexClassExample.txt             | UNCHANGED |26I       0C        |     UNSPECIFIED    0I      0C      0I      0C       |      0I      0C
+CMS2SampleDirect230.txt                 | UNCHANGED |76I       78C       |     UNSPECIFIED    0I      0C      0I      0C       |      0I      0C
+CMS2SampleDirectLong.txt                | UNCHANGED |97I       96C       |     UNSPECIFIED    0I      0C      0I      0C       |      0I      0C
+CMS2YSample.txt                         | UNCHANGED |6I        18C       |     UNSPECIFIED    0I      0C      0I      0C       |      0I      0C
+new.txt                                 | UNCHANGED |0I        0C        |     UNSPECIFIED    0I      0C      0I      0C       |      0I      0C
+newcms.txt                              |   ADDED   |0I        0C        |     UNSPECIFIED    6I      18C     0I      0C       |      0I      0C

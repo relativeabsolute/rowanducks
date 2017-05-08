@@ -7,7 +7,12 @@
 class CMS2File:
 
     def __init__(self, name, file_info):
-        self.name = name
+        self.name = ""
+        for c in name:
+            if c == '\\':
+                self.name += '/'
+            else:
+                self.name += c
         self.total_src_lines = file_info["Number of Lines"]
         self.goto_stmts = file_info["Go-To Statements"]
         self.notes = file_info["Notes"]

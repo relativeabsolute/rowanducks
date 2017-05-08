@@ -4,7 +4,7 @@ class CMS2FileDiff:
     def __init__(self, filename, status, additions,
                  modifications,
                  deletions):
-        self.filename = filename
+        self.name = filename
         self.moduleName = ""
         self.additions = additions
         self.modifications = modifications
