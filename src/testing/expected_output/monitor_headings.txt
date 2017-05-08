@@ -6,4 +6,3 @@ CMS2SampleDirect230.txt                 | UNCHANGED |76I       78C       |     U
 CMS2SampleDirectLong.txt                | UNCHANGED |97I       96C       |     UNSPECIFIED    0I      0C      0I      0C       |      0I      0C
 CMS2YSample.txt                         | UNCHANGED |6I        18C       |     UNSPECIFIED    0I      0C      0I      0C       |      0I      0C
 new.txt                                 | UNCHANGED |0I        0C        |     UNSPECIFIED    0I      0C      0I      0C       |      0I      0C
-newcms.txt                              |   ADDED   |0I        0C        |     UNSPECIFIED    6I      18C     0I      0C       |      0I      0C

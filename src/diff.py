@@ -125,7 +125,7 @@ class Diff:
             # Split by line into array
             try:
                 # If file is in repo
-                oldVersionFile = repo.git.show('HEAD:'+'src/'+file).splitlines()
+                oldVersionFile = repo.git.show('HEAD:'+file).splitlines()
                 # Add delimiter back in for comparison purposes
                 file_content = open(file).read().splitlines()
                 diff_info = self.analyze(file, oldVersionFile, file_content)

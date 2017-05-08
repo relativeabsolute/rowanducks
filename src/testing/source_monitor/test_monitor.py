@@ -36,7 +36,7 @@ class TestChangesTestCase(unittest.TestCase):
             for attr in diff_attr:
                 if(attr in expected):
                     if (attr != 'name'):
-                        self.assertEqual(getattr(file_diff, attr), expected[attr])
+                        self.assertEqual(str(getattr(file_diff, attr)), str(expected[attr]))
                     # If the key is 'name' we need to trim it for comparison
                     else:
                         self.assertEqual(os.path.split(getattr(file_diff,attr))[1], expected[attr])
@@ -67,7 +67,9 @@ class TestChangesTestCase(unittest.TestCase):
     def test_monitor_report(self):
         print('running test_monitor_report')
         columns = open('src/testing/expected_output/monitor_headings.txt').read()
-        self.assertEqual(columns, self.sm.main_string)
+        print(columns)
+        print(self.sm.main_string)
+        self.assertEqual(str(columns), str(self.sm.main_string))
 
     def find_file(self, expected_output, test_data):
         to_find = os.path.split(test_data.name)[1]
@@ -75,4 +77,4 @@ class TestChangesTestCase(unittest.TestCase):
         for file in expected_output:
             if file['name'] == str(to_find):
                 return file
-        return False
+        print(to_find)
