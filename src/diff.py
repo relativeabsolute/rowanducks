@@ -118,6 +118,7 @@ class Diff:
 
     # Run diff between local file and same file from latest commit
     def run_diff_on_latest_commit(self):
+
         repo = git.Repo('.')
         for file in self.input_files:
             # Get raw text of file from latest commit

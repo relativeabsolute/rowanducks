@@ -26,6 +26,8 @@ class CMS2File:
         self.direct_comments = file_info["Single line Direct CMS2 comments"]
         self.hl_single_line_stmt_counter = file_info["High Level CMS2 Single Line Statements"]
         self.hl_multi_line_stmt_counter = file_info["Multi-line High Level CMS2 Statements"]
+        self.procedures_over_250 = file_info["Procedures over 250 LoC"]
+        self.procedures_230_250 = file_info["Procedures 230-250 LoC"]
         self.total_exec_stmts = self.hl_exec_stmts + self.direct_exec_stmts
         self.hl_data_lines = 0
 
